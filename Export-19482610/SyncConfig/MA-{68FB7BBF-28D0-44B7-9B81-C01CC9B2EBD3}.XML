@@ -1,0 +1,140 @@
+<saved-ma-configuration server='SVMIMGLOASP01' export-date='2026-03-19 09:48:40.465'>
+<!--WARNING>
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!
+!! The contents of this file should not be edited.
+!! Any such modifications to this file may result in errors during import.
+!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+</WARNING-->
+<ma-data>
+ <format-version>1</format-version>
+ <id>{68FB7BBF-28D0-44B7-9B81-C01CC9B2EBD3}</id>
+ <name>MDM Country</name>
+ <category>Delimited</category>
+ <subtype/>
+ <ma-listname/>
+ <ma-companyname/>
+ <creation-time>2022-03-29 14:32:38.237</creation-time>
+ <last-modification-time>2026-02-12 08:08:42.777</last-modification-time>
+ <version>1338</version>
+ <internal-version>0</internal-version>
+ <password-sync-allowed>0</password-sync-allowed>
+ <schema>
+  <dsml:dsml xmlns:dsml="http://www.dsml.org/DSML" xmlns:ms-dsml="http://www.microsoft.com/MMS/DSML"><dsml:directory-schema ms-dsml:no-objectclass-validation="true"><dsml:class id="country" type="structural"><dsml:name>country</dsml:name><dsml:attribute ref="#alpha2" required="false" /><dsml:attribute ref="#num" required="true" /><dsml:attribute ref="#name" required="false" /></dsml:class><dsml:attribute-type id="alpha2" single-value="true"><dsml:name>alpha2</dsml:name><dsml:syntax>1.3.6.1.4.1.1466.115.121.1.15</dsml:syntax></dsml:attribute-type><dsml:attribute-type id="num" single-value="true" ms-dsml:immutable="true"><dsml:name>num</dsml:name><dsml:syntax>1.3.6.1.4.1.1466.115.121.1.15</dsml:syntax></dsml:attribute-type><dsml:attribute-type id="name" single-value="true"><dsml:name>name</dsml:name><dsml:syntax>1.3.6.1.4.1.1466.115.121.1.15</dsml:syntax></dsml:attribute-type></dsml:directory-schema></dsml:dsml>
+ </schema>
+ <attribute-inclusion><attribute>alpha2</attribute><attribute>num</attribute><attribute>name</attribute></attribute-inclusion>
+ <stay-disconnector />
+ <join>
+ <join-profile cd-object-type="country">
+  <join-criterion join-cri-type="sync-rule" id="{223887B3-65C5-471C-BAB6-112F7D73506F}" sync-rule-id="{3E5D567E-8A06-ED11-A86F-000D3AB74427}">
+   <search mv-object-type="country">
+    <attribute-mapping mv-attribute="country_Id">
+     <direct-mapping>
+      <src-attribute>num</src-attribute>
+     </direct-mapping>
+    </attribute-mapping>
+   </search>
+   <resolution type="none">
+    <script-context></script-context>
+   </resolution>
+  </join-criterion>
+ </join-profile>
+</join>
+
+ <projection>
+ <class-mapping cd-object-type="country" type="sync-rule" id="{C4C94994-B8D6-4D36-8A67-544321913E4F}" sync-rule-id="{3E5D567E-8A06-ED11-A86F-000D3AB74427}">
+  <mv-object-type>country</mv-object-type>
+ </class-mapping>
+</projection>
+
+ <export-attribute-flow>
+</export-attribute-flow>
+
+ <provisioning-cleanup type="declared"><action>make-normal-disconnector</action></provisioning-cleanup>
+ <extension />
+ <controller-configuration>
+ <application-protection>low</application-protection>
+ <application-architecture>process</application-architecture>
+</controller-configuration>
+
+ <description></description>
+ <ma-ui-settings><account-joiner-queries><attributes><cs><attribute name="num" header="num" size="100" /><attribute name="alpha2" header="alpha2" size="100" /><attribute name="name" header="name" size="100" /></cs><mv></mv></attributes><filters max_mv_search_results=""></filters></account-joiner-queries></ma-ui-settings>
+ <private-configuration>
+  <MAConfig><ui-data><xmlwizard><properties><sample_file>D:\MIM_Prod\Scripts\Data\In\country.csv</sample_file><code_page_description>Unicode (UTF-8)</code_page_description></properties><partitions><partition cd_name="default" guid="{F0F87ABE-378D-487F-821D-B8960C4642F6}" version="1"><object_class>country</object_class></partition></partitions><primary_class_mappings><mapping object_class="country" primary_class="country" user_define="-1"><attribute>alpha2</attribute><attribute>num</attribute><attribute>name</attribute></mapping></primary_class_mappings><object_classes><object_class cd_name="country" selected="-1" user_define="-1" configured="-1" anchor="" dn_as_anchor="0"><attribute mandatory="0">alpha2</attribute><attribute mandatory="-1">num</attribute><attribute mandatory="0">name</attribute></object_class></object_classes><attributes><attribute cd_name="alpha2" sample_data="AW" binary="0" multi_valued="0" file_reference="0" selected="-1" type="String" lower_bound="" upper_bound="" user_define="0" /><attribute cd_name="num" sample_data="533" binary="0" multi_valued="0" file_reference="0" selected="-1" type="String" lower_bound="" upper_bound="" user_define="0" /><attribute cd_name="name" sample_data="Aruba" binary="0" multi_valued="0" file_reference="0" selected="-1" type="String" lower_bound="" upper_bound="" user_define="0" /></attributes></xmlwizard></ui-data><importing><dn><attribute>num</attribute></dn><anchor><attribute>num</attribute></anchor><per-class-settings></per-class-settings><default_object_class>country</default_object_class></importing><exporting></exporting><ldap-dn>0</ldap-dn><delimited_format><code_page>65001</code_page><delimiter>59</delimiter><text_qualifier>34</text_qualifier><first_row_contains_headers>1</first_row_contains_headers><attributes><attribute><name>alpha2</name></attribute><attribute><name>num</name></attribute><attribute><name>name</name></attribute></attributes></delimited_format><primary_class_mappings><mapping><primary_class>country</primary_class><oc-value>country</oc-value></mapping></primary_class_mappings><enable-unapplied-merge>0</enable-unapplied-merge><password-extension-config><password-extension-enabled>0</password-extension-enabled><dll></dll><password-set-enabled></password-set-enabled><password-change-enabled></password-change-enabled><connection-info><connect-to></connect-to><user></user></connection-info><timeout></timeout></password-extension-config><data_normalization><force-uppercase>0</force-uppercase><remove-accents>0</remove-accents></data_normalization><case_normalize_dn_for_anchor>1</case_normalize_dn_for_anchor></MAConfig>
+ </private-configuration>
+ <SyncConfig-refresh-schema>0</SyncConfig-refresh-schema>
+ <ma-partition-data>
+ <partition>
+  <id>{F0F87ABE-378D-487F-821D-B8960C4642F6}</id>
+  <name>default</name>
+  <creation-time>2022-03-29 14:32:38.237</creation-time>
+  <last-modification-time>2022-03-29 14:33:38.860</last-modification-time>
+  <version>3</version>
+  <selected>1</selected>
+  <filter>
+   <object-classes>
+    <object-class>country</object-class>
+   </object-classes>
+   <containers>
+    <exclusions/>
+    <inclusions>
+     <inclusion></inclusion>
+    </inclusions>
+   </containers>
+  </filter>
+  <allowed-operations>1</allowed-operations>
+  <current>
+   <batch-number>1</batch-number>
+   <sequence-number>0</sequence-number>
+  </current>
+  <last-successful-batch>0</last-successful-batch>
+  <filter-hints>
+   <object-classes>
+    <object-class>
+     <name>country</name>
+     <hierarchy>
+      <object-class>country</object-class>
+     </hierarchy>
+     <included>1</included>
+    </object-class>
+   </object-classes>
+  </filter-hints>
+ </partition>
+</ma-partition-data>
+
+ <ma-run-data>
+ <run-configuration>
+  <id>{69099294-FF97-472C-A332-000FB96B748F}</id>
+  <name>DELTA Import and DELTA Synchro</name>
+  <creation-time>2022-04-29 08:36:29.110</creation-time>
+  <version>2</version>
+  <last-modification-time>2022-11-25 16:51:01.720</last-modification-time>
+  <configuration><step><step-type type="delta-import"></step-type><threshold><batch-size>1</batch-size></threshold><partition>{F0F87ABE-378D-487F-821D-B8960C4642F6}</partition><custom-data><run-config><input-file>country.csv</input-file></run-config></custom-data></step></configuration>
+ </run-configuration>
+ <run-configuration>
+  <id>{3CEF662A-95D2-4AB2-9B54-9B55C04190C3}</id>
+  <name>FULL Import and FULL Synchro</name>
+  <creation-time>2022-04-04 13:51:47.457</creation-time>
+  <version>3</version>
+  <last-modification-time>2022-11-25 16:51:01.723</last-modification-time>
+  <configuration><step><step-type type="full-import"><import-subtype>to-cs</import-subtype></step-type><threshold><batch-size>1</batch-size></threshold><partition>{F0F87ABE-378D-487F-821D-B8960C4642F6}</partition><custom-data><run-config><input-file>country.csv</input-file></run-config></custom-data></step><step><step-type type="apply-rules"><apply-rules-subtype>reevaluate-flow-connectors</apply-rules-subtype></step-type><threshold><batch-size>1</batch-size></threshold><partition>{F0F87ABE-378D-487F-821D-B8960C4642F6}</partition><custom-data></custom-data></step></configuration>
+ </run-configuration>
+ <run-configuration>
+  <id>{F87956F6-F1DD-48A7-BC6E-F98C6A351891}</id>
+  <name>FULL Synchro</name>
+  <creation-time>2022-04-13 15:41:06.610</creation-time>
+  <version>2</version>
+  <last-modification-time>2022-11-25 16:51:01.723</last-modification-time>
+  <configuration><step><step-type type="apply-rules"><apply-rules-subtype>reevaluate-flow-connectors</apply-rules-subtype></step-type><threshold><batch-size>1</batch-size></threshold><partition>{F0F87ABE-378D-487F-821D-B8960C4642F6}</partition><custom-data></custom-data></step></configuration>
+ </run-configuration>
+</ma-run-data>
+
+ <capabilities-mask>9000</capabilities-mask>
+ <export-type>3</export-type>
+ <dn-construction><attribute>num</attribute></dn-construction>
+ <password-sync><maximum-retry-count>10</maximum-retry-count><retry-interval>60</retry-interval><allow-low-security>0</allow-low-security></password-sync>
+ <component_mappings />
+</ma-data>
+
+</saved-ma-configuration>

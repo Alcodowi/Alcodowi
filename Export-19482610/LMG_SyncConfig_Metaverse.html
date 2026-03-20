@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SyncConfig — Métaverse &amp; Connecteurs MIM — LMG — Mars 2026</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{
+  --bg:#121212;--bg2:#1e1e1e;--bg3:#2a2a2a;--border:#333;
+  --text:#e0e0e0;--text2:#aaa;--ok:#4caf50;--warn:#ff9800;--crit:#f44336;
+  --accent:#2196f3;--accent2:#1565c0;--purple:#9c27b0
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:13px;display:flex;flex-direction:column;min-height:100vh}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── Header ── */
+header{background:var(--accent2);padding:16px 24px;border-bottom:3px solid var(--accent);flex-shrink:0}
+header h1{font-size:20px;font-weight:700;color:#fff}
+header p{color:#cce;font-size:11px;margin-top:3px}
+
+/* ── Navbar ── */
+.navbar{position:sticky;top:0;background:var(--bg2);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 12px;overflow-x:auto;overflow-y:hidden;flex-shrink:0;height:42px;z-index:100}
+.navbar-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-right:8px;white-space:nowrap;flex-shrink:0}
+.navbar a{display:inline-block;padding:6px 10px;color:var(--text2);text-decoration:none;font-size:11px;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s}
+.navbar a:hover{color:var(--text);background:var(--bg3);border-bottom-color:var(--accent)}
+.navbar a.active{color:var(--accent);border-bottom-color:var(--accent);background:rgba(33,150,243,.08)}
+.navbar-sep{border:none;border-left:1px solid var(--border);height:24px;margin:0 2px;flex-shrink:0}
+
+/* ── Summary bar ── */
+.summary-bar{display:flex;flex-wrap:wrap;gap:10px;padding:14px 20px;background:var(--bg2);border-bottom:1px solid var(--border)}
+.card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px 16px;min-width:110px;text-align:center}
+.card .num{font-size:22px;font-weight:700;color:var(--accent)}
+.card .lbl{font-size:10px;color:var(--text2);margin-top:3px}
+.card.green .num{color:var(--ok)}
+.card.orange .num{color:var(--warn)}
+.card.red .num{color:var(--crit)}
+.card.purple .num{color:#ce93d8}
+.card.teal .num{color:#4dd0e1}
+
+/* ── Main layout ── */
+.main-content{flex:1;padding:0 0 40px}
+
+/* ── Sections collapsibles ── */
+.section{border:1px solid var(--border);border-radius:6px;margin:10px 18px;overflow:hidden}
+.section-header{background:var(--bg2);padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;user-select:none;border:none;width:100%;text-align:left;transition:background .15s}
+.section-header:hover{background:var(--bg3)}
+.section-header h2{font-size:13px;font-weight:600;flex:1;color:var(--text)}
+.phase-badge{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:700;flex-shrink:0}
+.badge-green{background:rgba(76,175,80,.2);color:#81c784;border:1px solid #388e3c}
+.badge-blue{background:rgba(33,150,243,.2);color:#64b5f6;border:1px solid #1565c0}
+.badge-yellow{background:rgba(255,193,7,.15);color:#ffd54f;border:1px solid #f57f17}
+.badge-orange{background:rgba(255,152,0,.2);color:#ffb74d;border:1px solid #e65100}
+.badge-red{background:rgba(244,67,54,.2);color:#ef9a9a;border:1px solid #c62828}
+.badge-grey{background:rgba(96,125,139,.2);color:#b0bec5;border:1px solid #455a64}
+.badge-purple{background:rgba(156,39,176,.2);color:#ce93d8;border:1px solid #6a1b9a}
+.badge-cyan{background:rgba(0,188,212,.2);color:#80deea;border:1px solid #00838f}
+.badge-teal{background:rgba(0,150,136,.2);color:#4db6ac;border:1px solid #00796b}
+.toggle{font-size:16px;color:var(--accent);width:18px;text-align:center;flex-shrink:0;transition:transform .2s}
+.section-body{padding:14px 16px;display:none}
+.section-body.open{display:block}
+
+/* ── Tables ── */
+.table-wrap{overflow-x:auto;margin-bottom:12px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:var(--bg3);color:var(--text2);padding:5px 9px;text-align:left;border-bottom:2px solid var(--border);white-space:nowrap;position:sticky;top:0}
+td{padding:5px 9px;border-bottom:1px solid var(--border)}
+tr:hover td{background:rgba(255,255,255,.03)}
+td code,th code{background:#2a3040;padding:1px 4px;border-radius:3px;font-size:11px;color:#90caf9}
+.tag-import{color:#81c784}.tag-export{color:#ff8a65}.tag-bidir{color:#64b5f6}
+.tag-rh{color:#ce93d8}.tag-ad{color:#ffd54f}.tag-fimportal{color:#4fc3f7}
+.tag-ref{color:#a5d6a7}.tag-ecma{color:#ffb74d}
+
+/* ── Callouts ── */
+.callout{display:flex;gap:10px;padding:10px 14px;border-radius:5px;margin:10px 0;font-size:12px;line-height:1.6}
+.callout-info{background:rgba(33,150,243,.1);border-left:3px solid var(--accent)}
+.callout-warn{background:rgba(255,152,0,.1);border-left:3px solid var(--warn)}
+.callout-crit{background:rgba(244,67,54,.1);border-left:3px solid var(--crit)}
+.callout-ok{background:rgba(76,175,80,.1);border-left:3px solid var(--ok)}
+.callout-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+
+/* ── Section prose ── */
+.section-body p{margin:8px 0;line-height:1.7;font-size:13px;color:#ccc}
+.section-body h3{font-size:12px;color:var(--text2);margin:14px 0 6px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.section-body strong{color:#fff}
+
+/* ── Mermaid ── */
+.mermaid-wrap{background:#0d1117;border:1px solid var(--border);border-radius:6px;padding:16px;margin:10px 0;overflow-x:auto;text-align:center}
+.mermaid-wrap .mermaid{display:inline-block;min-width:300px}
+
+/* ── Sous-sections ── */
+.subsection{margin:14px 0 8px;padding-left:10px;border-left:3px solid var(--border)}
+.subsection h3{margin:0 0 6px;font-size:13px;color:#90caf9;font-weight:600;border:none;text-transform:none;letter-spacing:0}
+
+/* ── MA cards grid ── */
+.ma-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin:10px 0}
+.ma-card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:12px 14px}
+.ma-card-title{font-size:12px;font-weight:700;color:#90caf9;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.ma-card-meta{font-size:11px;color:var(--text2);line-height:1.7}
+.ma-card-meta span{color:var(--text)}
+.ma-type{font-size:10px;padding:2px 6px;border-radius:3px;font-weight:600}
+.ma-type-ad{background:rgba(255,193,7,.15);color:#ffd54f;border:1px solid #f57f17}
+.ma-type-ecma{background:rgba(255,152,0,.15);color:#ffb74d;border:1px solid #e65100}
+.ma-type-delim{background:rgba(76,175,80,.15);color:#81c784;border:1px solid #388e3c}
+.ma-type-fim{background:rgba(33,150,243,.15);color:#64b5f6;border:1px solid #1565c0}
+.ma-type-obsolete{background:rgba(244,67,54,.12);color:#ef9a9a;border:1px solid #c62828;text-decoration:line-through}
+
+/* ── Obsolète ── */
+.badge-obsolete{background:rgba(244,67,54,.2);color:#ef9a9a;border:1px solid #c62828}
+.ma-card.obsolete{opacity:.5;border:1px dashed var(--crit)}
+.ma-card.obsolete .ma-card-title{color:#ef9a9a}
+.obsolete-row td{opacity:.5;color:var(--text2)}
+.obsolete-row td strong,.obsolete-row td code{color:var(--text2) !important}
+.obsolete-row td s{text-decoration:line-through}
+
+/* ── Attr flow badges ── */
+.flow-in{color:#81c784;font-weight:700}
+.flow-out{color:#ff8a65;font-weight:700}
+.flow-both{color:#64b5f6;font-weight:700}
+
+/* ── Footer ── */
+footer{text-align:center;padding:14px;color:var(--text2);font-size:11px;border-top:1px solid var(--border);background:var(--bg2)}
+
+/* ── Bouton Agrandir ── */
+.expand-btn{display:block;margin:8px auto 2px;background:rgba(33,150,243,.08);border:1px solid rgba(33,150,243,.25);color:#64b5f6;padding:4px 16px;border-radius:3px;cursor:pointer;font-size:11px;transition:all .15s}
+.expand-btn:hover{background:rgba(33,150,243,.2);border-color:var(--accent);color:#fff}
+
+/* ── Modal plein écran ── */
+#diag-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9000;align-items:center;justify-content:center}
+#diag-modal.open{display:flex}
+.modal-inner{background:#0d1520;border:1px solid var(--accent);border-radius:8px;width:96vw;height:94vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 0 80px rgba(0,0,0,.9)}
+.modal-toolbar{display:flex;align-items:center;padding:8px 14px;background:var(--bg3);border-bottom:1px solid var(--border);gap:6px;flex-shrink:0}
+.modal-title{flex:1;font-size:13px;font-weight:600;color:#90caf9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.modal-actions{display:flex;gap:5px;align-items:center;flex-shrink:0}
+.modal-actions button{background:var(--bg2);border:1px solid var(--border);color:var(--text2);padding:4px 10px;border-radius:3px;cursor:pointer;font-size:12px;white-space:nowrap}
+.modal-actions button:hover{color:var(--text);border-color:var(--accent)}
+.modal-actions .zoom-lbl{font-size:11px;color:var(--text2);min-width:38px;text-align:center}
+.modal-body{flex:1;overflow:auto;padding:28px;background:#080e1a}
+#modal-svg-el{display:inline-block;min-width:100%}
+#modal-svg-el svg{display:block;height:auto !important}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔗 SyncConfig — Métaverse &amp; Connecteurs MIM — LMG</h1>
+  <p>Microsoft Identity Manager (MIM) &nbsp;|&nbsp; Serveur : SVMIMGLOASP01 &nbsp;|&nbsp; Exporté : 19 Mars 2026 &nbsp;|&nbsp; 10 Management Agents &nbsp;|&nbsp; 23 types d'objets MV</p>
+</header>
+
+<div class="summary-bar">
+  <div class="card teal"><div class="num">10</div><div class="lbl">Management Agents</div></div>
+  <div class="card green"><div class="num">23</div><div class="lbl">Types d'objets MV</div></div>
+  <div class="card blue"><div class="num">196</div><div class="lbl">Attributs MV</div></div>
+  <div class="card"><div class="num">143</div><div class="lbl">Attributs Person</div></div>
+  <div class="card purple"><div class="num">26</div><div class="lbl">Attrs LMG custom</div></div>
+  <div class="card orange"><div class="num">7</div><div class="lbl">Flux Export IRIS</div></div>
+</div>
+
+<nav class="navbar">
+  <span class="navbar-title">Navigation</span>
+  <a href="#sec-overview">Vue d'ensemble</a>
+  <a href="#sec-mv">Métaverse (MV)</a>
+  <a href="#sec-ma-ad">AD MA</a>
+  <a href="#sec-ma-fim">FIM Portal MA</a>
+  <a href="#sec-ma-rh" title="Obsolète — remplacé par MDM RH IRIS - MA" style="text-decoration:line-through;opacity:.45">MDM RH</a>
+  <a href="#sec-ma-iris">MDM RH IRIS ★</a>
+  <a href="#sec-ma-iris-export">IRIS Export</a>
+  <a href="#sec-ma-site">MDM Site</a>
+  <a href="#sec-ma-company">MDM Company</a>
+  <a href="#sec-ma-unit">MDM Units</a>
+  <a href="#sec-ma-country">MDM Country</a>
+  <a href="#sec-ma-recon">MDM Réconciliation</a>
+  <hr class="navbar-sep">
+  <a href="#sec-flows">Flux d'attributs</a>
+  <a href="#sec-join">Règles de jointure</a>
+  <a href="#sec-runprofiles">Profils d'exécution</a>
+</nav>
+
+<div class="main-content">
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- VUE D'ENSEMBLE -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-overview">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>1. Vue d'ensemble de l'architecture de synchronisation</h2>
+    <span class="phase-badge badge-blue">Global</span>
+  </button>
+  <div class="section-body open">
+    <p>Le moteur de synchronisation MIM (<strong>FIMSynchronizationService</strong>) orchestre les flux d'identités entre plusieurs sources autoritaires et les systèmes cibles. Au centre se trouve la <strong>Métaverse (MV)</strong> — un référentiel unifié d'identités. Les <strong>Management Agents (MA)</strong> gèrent les Connector Spaces (CS) qui font le lien entre chaque système connecté et la MV.</p>
+
+    <div class="callout callout-info">
+      <span class="callout-icon">ℹ️</span>
+      <div>Le serveur de synchronisation est <strong>SVMIMGLOASP01</strong>. Les extensions règles sont implémentées via <strong>Lithnet.Umare.RulesExtension.dll</strong> (framework UMARE — Unified MA Rules Extension).</div>
+    </div>
+
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+flowchart LR
+    subgraph SOURCES["📥 Sources autoritaires"]
+        RH["⚠️ MDM RH\n(OBSOLÈTE)"]
+        IRIS["MDM RH IRIS\n(iHris CSV — Source principale)"]
+        SITE["MDM Site\n(CSV Sites)"]
+        COMP["MDM Company\n(CSV Entités)"]
+        UNIT["MDM Units\n(CSV Unités)"]
+        CNTRY["MDM Country\n(CSV Pays)"]
+        RECON["MDM Réconciliation\n(CSV)"]
+    end
+
+    subgraph MV["🧠 Métaverse MIM\n(SVMIMGLOASP01)"]
+        MVO["person\ngroup\nLMG_Site\nLMG_Company\nLMG_Unit\nLMG_BL\ncountry..."]
+    end
+
+    subgraph TARGETS["📤 Systèmes cibles"]
+        AD["Active Directory\n(FromEarthToLife.net)"]
+        FIM["FIM Portal\n(Service MIM)"]
+        IRISEXP["MDM RH IRIS Export\n(Retour CSV → iHris)"]
+    end
+
+    RH -. "⚠️ OBSOLÈTE" .-> MV
+    IRIS -- "Import\nEmployeeID join" --> MV
+    SITE -- "Import\nSiteCode join" --> MV
+    COMP -- "Import\ncompany_ID join" --> MV
+    UNIT -- "Import\nUnitCode join" --> MV
+    CNTRY -- "Import\ncountry_Id join" --> MV
+    RECON -- "Import\nEmployeeID" --> MV
+    MV -- "Export\nDN Construction\n51 attr flows" --> AD
+    MV -- "Export\n151 attr flows" --> FIM
+    MV -- "Export\n7 attr (feedback)" --> IRISEXP
+      </div>
+    </div>
+
+    <h3>Inventaire des Management Agents</h3>
+    <div class="ma-grid">
+      <div class="ma-card">
+        <div class="ma-card-title"><span class="ma-type ma-type-ad">AD</span> AD MA</div>
+        <div class="ma-card-meta">
+          Domaine : <span>FromEarthToLife.net</span><br>
+          Objets CS : <span>user, group, contact, computer</span><br>
+          Flows Export : <span>51 attributs → AD</span><br>
+          Password Sync : <span style="color:var(--ok)">✔ Activé</span>
+        </div>
+      </div>
+      <div class="ma-card">
+        <div class="ma-card-title"><span class="ma-type ma-type-fim">FIM</span> FIM MA</div>
+        <div class="ma-card-meta">
+          Connecteur : <span>FIM Service MA</span><br>
+          Objets CS : <span>Person, Group, SynchronizationRule, LMG_*...</span><br>
+          Flows Export : <span>151 attributs → FIM Portal</span><br>
+          Join rules : <span>14 types d'objets</span>
+        </div>
+      </div>
+      <div class="ma-card obsolete">
+        <div class="ma-card-title"><span class="ma-type ma-type-obsolete">ECMA2</span> <s>MDM RH - Update New</s> <span class="phase-badge badge-obsolete">Obsolète</span></div>
+        <div class="ma-card-meta">
+          Type : <span>Generic CSV (Microsoft)</span><br>
+          Extension : <span>Lithnet.Umare.RulesExtension.dll</span><br>
+          Objet CS : <span>User</span><br>
+          Join : <span>MV:employeeID = CS:EmployeeID</span><br>
+          <span style="color:#ef9a9a;font-style:italic">⚠️ Remplacé par : MDM RH IRIS - MA</span>
+        </div>
+      </div>
+      <div class="ma-card">
+        <div class="ma-card-title"><span class="ma-type ma-type-ecma">ECMA2</span> MDM RH IRIS - MA</div>
+        <div class="ma-card-meta">
+          Type : <span>Generic CSV (Microsoft)</span><br>
+          Extension : <span>Lithnet.Umare.RulesExtension.dll</span><br>
+          Objet CS : <span>User</span><br>
+          Join : <span>MV:employeeID = CS:EmployeeID</span>
+        </div>
+      </div>
+      <div class="ma-card">
+        <div class="ma-card-title"><span class="ma-type ma-type-ecma">ECMA2</span> MDM RH IRIS - Export</div>
+        <div class="ma-card-meta">
+          Type : <span>Generic CSV (Microsoft)</span><br>
+          Direction : <span style="color:#ff8a65">Export uniquement</span><br>
+          Objet CS : <span>User</span><br>
+          Flows Export : <span>7 attributs → iHris (feedback)</span>
+        </div>
+      </div>
+      <div class="ma-card">
+        <div class="ma-card-title"><span class="ma-type ma-type-ecma">ECMA2</span> MDM Site - MA</div>
+        <div class="ma-card-meta">
+          Type : <span>Generic CSV (Microsoft)</span><br>
+          Extension : <span>Lithnet.Umare.RulesExtension.dll</span><br>
+          Objet CS : <span>User (id, commonName, siteCodeIT...)</span><br>
+          Join : <span>MV:siteCode = CS:siteCodeIT → LMG_Site</span>
+        </div>
+      </div>
+      <div class="ma-card">
+        <div class="ma-card-title"><span class="ma-type ma-type-ecma">ECMA2</span> MDM Company - MA</div>
+        <div class="ma-card-meta">
+          Type : <span>Generic CSV (Microsoft)</span><br>
+          Extension : <span>Lithnet.Umare.RulesExtension.dll</span><br>
+          Objet CS : <span>User (legalEntityCode, legalEntityID...)</span><br>
+          Join : <span>MV:company_ID = CS:legalEntityID → LMG_Company</span>
+        </div>
+      </div>
+      <div class="ma-card">
+        <div class="ma-card-title"><span class="ma-type ma-type-ecma">ECMA2</span> MDM - Units - MA</div>
+        <div class="ma-card-meta">
+          Type : <span>Generic CSV (Microsoft)</span><br>
+          Extension : <span>Lithnet.Umare.RulesExtension.dll</span><br>
+          Objet CS : <span>User (UnitCode, UnitName, BLCode...)</span><br>
+          Join : <span>MV:LMG_unitCode = CS:UnitCode → LMG_Unit</span>
+        </div>
+      </div>
+      <div class="ma-card">
+        <div class="ma-card-title"><span class="ma-type ma-type-delim">CSV</span> MDM Country</div>
+        <div class="ma-card-meta">
+          Type : <span>Delimited Text</span><br>
+          Objet CS : <span>country (alpha2, num, name)</span><br>
+          Join : <span>MV:country_Id = CS:num → country</span>
+        </div>
+      </div>
+      <div class="ma-card">
+        <div class="ma-card-title"><span class="ma-type ma-type-delim">CSV</span> MDM RH - Reconciliation</div>
+        <div class="ma-card-meta">
+          Type : <span>Delimited Text</span><br>
+          Objet CS : <span>person (EmployeeID, SamAccountName...)</span><br>
+          Join : <span>MV:LMG_country_ID = CS:countryCode</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- MÉTAVERSE -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-mv">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>2. Métaverse (MV) — Schéma et types d'objets</h2>
+    <span class="phase-badge badge-cyan">Métaverse</span>
+  </button>
+  <div class="section-body open">
+    <p>La Métaverse est le référentiel central de MIM. Elle contient <strong>23 types d'objets</strong> et <strong>196 types d'attributs</strong>. Le type <code>person</code> est le plus riche avec <strong>143 attributs</strong>.</p>
+
+    <div class="callout callout-info">
+      <span class="callout-icon">ℹ️</span>
+      <div>Les types d'objets préfixés <strong>LMG_</strong> sont des extensions personnalisées spécifiques au client : <code>LMG_BL</code> (Business Lines), <code>LMG_Unit</code>, <code>LMG_Site</code>, <code>LMG_Company</code>, <code>LMG_serviceAccount</code>, <code>LMG_adminAccount</code>, <code>LMG_exchangeObject</code>, <code>LMG_contact</code>.</div>
+    </div>
+
+    <h3>Types d'objets dans la Métaverse</h3>
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+flowchart TD
+    subgraph MV["🧠 MÉTAVERSE — 23 types d'objets"]
+        subgraph IDENT["Identités"]
+            P["person\n(143 attrs)"]
+            SA["serviceAccount\n(7 attrs)"]
+            LSA["LMG_serviceAccount\n(9 attrs)"]
+            LAA["LMG_adminAccount\n(8 attrs)"]
+            LC["LMG_contact\n(9 attrs)"]
+            LEO["LMG_exchangeObject\n(12 attrs)"]
+        end
+        subgraph GROUPS["Groupes & Rôles"]
+            G["group\n(39 attrs)"]
+            R["role\n(15 attrs)"]
+        end
+        subgraph REF["Référentiels"]
+            SITE["LMG_Site\n(17 attrs)"]
+            COMP["LMG_Company\n(9 attrs)"]
+            UNIT["LMG_Unit\n(10 attrs)"]
+            BL["LMG_BL\n(8 attrs)"]
+            CTR["country\n(9 attrs)"]
+        end
+        subgraph SYS["Objets système MIM"]
+            SR["synchronizationRule\n(21 attrs)"]
+            ERE["expectedRuleEntry\n(10 attrs)"]
+            DRE["detectedRuleEntry\n(7 attrs)"]
+            FN["function\n(10 attrs)"]
+        end
+        subgraph INFRA["Infra AD standard"]
+            OU["organizationalUnit"]
+            ORG["organization"]
+            DOM["domain"]
+            COMP2["computer\n(14 attrs)"]
+            LOC["locality"]
+            PRT["printer"]
+        end
+    end
+      </div>
+    </div>
+
+    <h3>Attributs clés du type <code>person</code></h3>
+    <div class="callout callout-ok">
+      <span class="callout-icon">✅</span>
+      <div>Le type <strong>person</strong> est le pivot central de toute la synchronisation. Il agrège les données RH, AD, référentiels et attributs de contrôle LMG.</div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Catégorie</th><th>Attributs MV</th><th>Rôle</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Identité de base</strong></td><td><code>accountName</code>, <code>firstName</code>, <code>lastName</code>, <code>displayName</code>, <code>loginName</code>, <code>UserPrincipalName</code></td><td>Identifiants principaux</td></tr>
+          <tr><td><strong>RH &amp; Cycle de vie</strong></td><td><code>employeeID</code>, <code>employeeType</code>, <code>employeeStatus</code>, <code>employeeStartDate</code>, <code>employeeEndDate</code></td><td>Source autoritaire RH</td></tr>
+          <tr><td><strong>Contrôle de compte</strong></td><td><code>Visible</code>, <code>outofscope</code>, <code>adAccountStatus</code>, <code>userAccountControl</code></td><td>Flags d'activation/blocage</td></tr>
+          <tr><td><strong>Référentiels organisationnels</strong></td><td><code>company</code>, <code>companyCode</code>, <code>company_ID</code>, <code>LMG_blCode</code>, <code>LMG_blName</code>, <code>LMG_unitCode</code>, <code>LMG_unitName</code>, <code>LMG_siteID</code></td><td>Structure organisationnelle</td></tr>
+          <tr><td><strong>Géographie</strong></td><td><code>country</code>, <code>countryCode</code>, <code>countryCodeISO</code>, <code>LMG_country_ID</code>, <code>city</code>, <code>postalCode</code>, <code>clusterCode</code></td><td>Localisation</td></tr>
+          <tr><td><strong>Messagerie</strong></td><td><code>email</code>, <code>mail</code>, <code>mailNickname</code>, <code>proxyAddressCollection</code>, <code>LMG_MailboxEnabled</code>, <code>LMG_MailboxSatus</code></td><td>Exchange / O365</td></tr>
+          <tr><td><strong>AD technique</strong></td><td><code>AD_objectGUID</code>, <code>dnAD</code>, <code>LMG_AD_ObjectDN</code>, <code>LMG_mS-DS-ConsistencyGuid</code>, <code>objectSid</code></td><td>Lien avec AD</td></tr>
+          <tr><td><strong>LMG custom — Sources</strong></td><td><code>LMG_fromIris</code>, <code>LMG_FromMDMRH</code>, <code>LMG_iHris_DN</code>, <code>LMG_FromhIris_EmployeeEndDate</code></td><td>Traçabilité source</td></tr>
+          <tr><td><strong>LMG custom — Contrôle</strong></td><td><code>LMG_flagPasswordNeverExpire</code>, <code>LMG_AccountExpire</code>, <code>LMG_extensionAttribute6</code>, <code>LMG_employeeEndDate_UTCFileTime</code></td><td>Paramétrage compte</td></tr>
+          <tr><td><strong>LMG custom — Feedback AD</strong></td><td><code>LMG_FromAD_firstName</code>, <code>LMG_FromAD_lastName</code>, <code>LMG_FromAD_displayName</code>, <code>LMG_FromAD_loginName</code>, <code>LMG_FromAD_accountName</code></td><td>Valeurs lues depuis AD</td></tr>
+          <tr><td><strong>Gestion des mots de passe</strong></td><td><code>initialPasword</code>, <code>resetPassword</code>, <code>freezeCount</code>, <code>freezeLevel</code>, <code>lastResetAttemptTime</code></td><td>SSPR &amp; init password</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Référentiels LMG dans la MV</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Type MV</th><th>Attributs clés</th><th>Clé de jointure</th><th>MA Source</th></tr></thead>
+        <tbody>
+          <tr><td><code>LMG_Site</code></td><td>siteCode, siteIdString, city, postalCode, country, clusterCode, LMG_state</td><td>siteCode = CS:siteCodeIT</td><td>MDM Site - MA</td></tr>
+          <tr><td><code>LMG_Company</code></td><td>company_ID, companyCode, displayName, mailDomainId, type</td><td>company_ID = CS:legalEntityID</td><td>MDM Company - MA</td></tr>
+          <tr><td><code>LMG_Unit</code></td><td>LMG_unitCode, LMG_unitName, LMG_unitBLCode, LMG_unitBLRef, LMG_unitStatus</td><td>LMG_unitCode = CS:UnitCode</td><td>MDM - Units - MA</td></tr>
+          <tr><td><code>LMG_BL</code></td><td>LMG_blCode, LMG_blName, LMG_blStatus, displayName</td><td>(via LMG_Unit)</td><td>MDM - Units - MA</td></tr>
+          <tr><td><code>country</code></td><td>country_Id, countryCode, countryCodeISO, displayName</td><td>country_Id = CS:num</td><td>MDM Country</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- AD MA -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-ma-ad">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>3. AD MA — Active Directory Management Agent</h2>
+    <span class="phase-badge badge-yellow">AD Connector</span>
+  </button>
+  <div class="section-body open">
+    <p>L'<strong>AD MA</strong> est le connecteur vers l'Active Directory du domaine <strong>FromEarthToLife.net</strong>. C'est le principal système cible : MIM provisionne et maintient les comptes utilisateurs, groupes, contacts et ordinateurs dans AD. Il est le seul MA à avoir la <strong>synchronisation de mots de passe activée</strong>.</p>
+
+    <div class="callout callout-info">
+      <span class="callout-icon">🔑</span>
+      <div><strong>Password Sync activé.</strong> Les mots de passe initiaux (<code>initialPasword</code>) et réinitialisés (<code>resetPassword</code>) sont exportés vers AD via l'attribut <code>unicodePwd</code>.</div>
+    </div>
+
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+flowchart TD
+    subgraph MV["🧠 Métaverse"]
+        MP["person"]
+        MG["group"]
+        MC["LMG_contact"]
+        MCO["computer"]
+    end
+
+    subgraph CS_AD["Connector Space — AD MA"]
+        CSU["CS: user"]
+        CSG["CS: group"]
+        CSC["CS: contact"]
+        CSCO["CS: computer"]
+    end
+
+    subgraph AD["📂 Active Directory\nFromEarthToLife.net"]
+        ADU["AD: user object\n(sAMAccountName, UPN, unicodePwd...)"]
+        ADG["AD: group object"]
+        ADC["AD: contact object"]
+        ADCO["AD: computer object"]
+    end
+
+    MP -- "JOIN: AD_objectGUID=objectGUID\n⬇ Export: 51 attr flows" --> CSU
+    MG -- "JOIN: member/group" --> CSG
+    MC -- "JOIN: sAMAccountName" --> CSC
+    MCO -- "JOIN: computer" --> CSCO
+    CSU -- "Export" --> ADU
+    CSG -- "Export" --> ADG
+    CSC -- "Export" --> ADC
+    CSCO -- "Export" --> ADCO
+    ADU -- "Import\n(feedback AD→MV)" --> CSU
+      </div>
+    </div>
+
+    <h3>Règles de jointure (CS ↔ MV)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>CS Object Type</th><th>MV Object Type</th><th>Critère de jointure</th><th>Résolution</th></tr></thead>
+        <tbody>
+          <tr><td><code>user</code></td><td><code>person</code></td><td>MV:<code>AD_objectGUID</code> = CS:<code>objectGUID</code></td><td>Sync Rule</td></tr>
+          <tr><td><code>user</code></td><td><code>LMG_serviceAccount</code></td><td>MV:<code>accountName</code> = CS:<code>sAMAccountName</code></td><td>Sync Rule</td></tr>
+          <tr><td><code>user</code></td><td><code>LMG_exchangeObject</code></td><td>MV:<code>accountName</code> = CS:<code>sAMAccountName</code></td><td>Sync Rule</td></tr>
+          <tr><td><code>contact</code></td><td><code>LMG_contact</code></td><td>CS join sur sAMAccountName</td><td>Sync Rule</td></tr>
+          <tr><td><code>group</code></td><td><code>group</code></td><td>Sync Rule group</td><td>Sync Rule</td></tr>
+          <tr><td><code>computer</code></td><td><code>computer</code></td><td>Sync Rule computer</td><td>Sync Rule</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Flux d'export vers AD (MV → CS → AD) — 51 flux</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Attribut AD</th><th>Source MV</th><th>Catégorie</th></tr></thead>
+        <tbody>
+          <tr><td><code>sAMAccountName</code></td><td><code>accountName</code></td><td>Identité</td></tr>
+          <tr><td><code>userPrincipalName</code></td><td><code>accountName</code></td><td>Identité</td></tr>
+          <tr><td><code>dn</code> (placement OU)</td><td><code>dnAD</code> / <code>employeeStatus</code></td><td>Placement</td></tr>
+          <tr><td><code>name</code></td><td><code>accountName</code></td><td>Identité</td></tr>
+          <tr><td><code>unicodePwd</code></td><td><code>initialPasword</code></td><td>Mot de passe</td></tr>
+          <tr><td><code>userAccountControl</code></td><td><code>LMG_flagPasswordNeverExpire</code> + calculé</td><td>Contrôle compte</td></tr>
+          <tr><td><code>pwdLastSet</code></td><td>[Calculé — scripted]</td><td>Mot de passe</td></tr>
+          <tr><td><code>accountExpires</code></td><td><code>employeeEndDate</code></td><td>Expiration</td></tr>
+          <tr><td><code>givenName</code></td><td><code>firstName</code></td><td>Identité</td></tr>
+          <tr><td><code>sn</code></td><td><code>lastName</code></td><td>Identité</td></tr>
+          <tr><td><code>displayName</code></td><td><code>displayName</code></td><td>Identité</td></tr>
+          <tr><td><code>title</code></td><td><code>jobTitle</code></td><td>RH</td></tr>
+          <tr><td><code>department</code></td><td><code>department</code></td><td>RH</td></tr>
+          <tr><td><code>company</code></td><td><code>company</code></td><td>Référentiel</td></tr>
+          <tr><td><code>mail</code></td><td><code>email</code></td><td>Messagerie</td></tr>
+          <tr><td><code>proxyAddresses</code></td><td><code>proxyAddressCollection</code></td><td>Messagerie</td></tr>
+          <tr><td><code>mailNickname</code></td><td><code>mailNickname</code></td><td>Messagerie</td></tr>
+          <tr><td><code>mobile</code></td><td><code>mobilePhone</code></td><td>Contact</td></tr>
+          <tr><td><code>telephoneNumber</code></td><td><code>officePhone</code></td><td>Contact</td></tr>
+          <tr><td><code>facsimileTelephoneNumber</code></td><td><code>officeFax</code></td><td>Contact</td></tr>
+          <tr><td><code>physicalDeliveryOfficeName</code></td><td><code>officeLocation</code></td><td>Contact</td></tr>
+          <tr><td><code>manager</code></td><td><code>manager</code></td><td>Organisation</td></tr>
+          <tr><td><code>o</code></td><td><code>LMG_unitName</code></td><td>Référentiel</td></tr>
+          <tr><td><code>description</code></td><td><code>description</code></td><td>Général</td></tr>
+          <tr><td><code>thumbnailPhoto</code></td><td><code>photo</code></td><td>Profil</td></tr>
+          <tr><td><code>preferredLanguage</code></td><td><code>preferredLanguage</code></td><td>Localisation</td></tr>
+          <tr><td><code>c</code></td><td><code>countryCode</code></td><td>Localisation</td></tr>
+          <tr><td><code>co</code></td><td><code>country</code></td><td>Localisation</td></tr>
+          <tr><td><code>countryCode</code></td><td><code>LMG_country_ID</code></td><td>Localisation</td></tr>
+          <tr><td><code>l</code></td><td><code>city</code></td><td>Localisation</td></tr>
+          <tr><td><code>postalCode</code></td><td><code>postalCode</code></td><td>Localisation</td></tr>
+          <tr><td><code>st</code></td><td><code>st</code></td><td>Localisation</td></tr>
+          <tr><td><code>streetAddress</code></td><td><code>address</code></td><td>Localisation</td></tr>
+          <tr><td><code>extensionAttribute1</code></td><td><code>clusterCode</code></td><td>LMG custom</td></tr>
+          <tr><td><code>extensionAttribute4</code></td><td><code>LMG_unitCode</code></td><td>LMG custom</td></tr>
+          <tr><td><code>extensionAttribute5</code></td><td><code>LMG_blCode</code></td><td>LMG custom</td></tr>
+          <tr><td><code>extensionAttribute6</code></td><td><code>employeeType</code></td><td>LMG custom</td></tr>
+          <tr><td><code>extensionAttribute7</code></td><td><code>LMG_blName</code></td><td>LMG custom</td></tr>
+          <tr><td><code>extensionAttribute8</code></td><td><code>siteCode</code></td><td>LMG custom</td></tr>
+          <tr><td><code>extensionAttribute9</code></td><td><code>companyCode</code></td><td>LMG custom</td></tr>
+          <tr><td><code>extensionAttribute11</code></td><td><code>LMG_siteID</code></td><td>LMG custom</td></tr>
+          <tr><td><code>extensionAttribute13</code></td><td><code>LMG_emailContact</code></td><td>LMG custom</td></tr>
+          <tr><td><code>extensionAttribute15</code></td><td>[Calculé — scripted]</td><td>LMG custom</td></tr>
+          <tr><td><code>employeeID</code></td><td><code>employeeID</code></td><td>RH</td></tr>
+          <tr><td><code>employeeType</code></td><td><code>employeeType</code></td><td>RH</td></tr>
+          <tr><td><code>member</code></td><td><code>member</code></td><td>Groupes</td></tr>
+          <tr><td><code>managedBy</code></td><td><code>displayedOwner</code></td><td>Groupes</td></tr>
+          <tr><td><code>msExchCoManagedByLink</code></td><td><code>LMG_msExchCoManagedByLink</code></td><td>Exchange</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Profils d'exécution</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Profil</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><strong>DELTA Import</strong></td><td>Delta Import</td><td>Import des changements AD depuis le dernier cycle</td></tr>
+          <tr><td><strong>DELTA Import and DELTA Synchro</strong></td><td>Delta Import + Synchro</td><td>Import + synchronisation delta en séquence</td></tr>
+          <tr><td><strong>DELTA Synchro</strong></td><td>Delta Synchronization</td><td>Synchronisation des objets en attente</td></tr>
+          <tr><td><strong>Export</strong></td><td>Export</td><td>Export des modifications vers AD</td></tr>
+          <tr><td><strong>FULL Import</strong></td><td>Full Import</td><td>Import complet de tous les objets AD</td></tr>
+          <tr><td><strong>Full Import and Full Synchro</strong></td><td>Full Import + Synchro</td><td>Recharge complète et synchronisation</td></tr>
+          <tr><td><strong>FULL Synchro</strong></td><td>Full Synchronization</td><td>Resynchronisation complète de tous les objets</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- FIM PORTAL MA -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-ma-fim">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>4. FIM MA — FIM Service / MIM Portal Management Agent</h2>
+    <span class="phase-badge badge-cyan">FIM Portal</span>
+  </button>
+  <div class="section-body open">
+    <p>Le <strong>FIM MA</strong> est le connecteur entre le moteur de synchronisation et le <strong>Service MIM (FIM Service)</strong>. Il synchronise tous les objets du portail MIM — utilisateurs, groupes, règles de synchronisation, etc. — avec la Métaverse. Il gère <strong>151 flux d'export</strong> et <strong>14 types d'objets</strong> en jointure.</p>
+
+    <div class="callout callout-warn">
+      <span class="callout-icon">⚠️</span>
+      <div>Le FIM MA est bidirectionnel : il importe les données du portail MIM vers la MV (ex : modifications faites via le portail self-service) <strong>et</strong> exporte les données MV vers le portail (provisionnement des attributs Person, Group, SynchronizationRule, etc.).</div>
+    </div>
+
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+flowchart LR
+    subgraph FIM_PORTAL["🌐 FIM Portal / MIM Service"]
+        FP["Person\nGroup\nSynchronizationRule\nLMG_Unit / LMG_Site\nLMG_Company / LMG_BL\nLMG_Contact\nLMG_ServiceAccount\nLMG_ExchangeObject\nCountry\nDetectedRuleEntry\nExpectedRuleEntry"]
+    end
+    subgraph CS_FIM["CS — FIM MA"]
+        CSFIM["CS Objects\n(14 types)"]
+    end
+    subgraph MV_BOX["🧠 Métaverse"]
+        MVF["person / group\nLMG_* / country\nsynchronizationRule\nexpectedRuleEntry\ndetectedRuleEntry"]
+    end
+
+    FP -- "Import\n(changements portail)" --> CSFIM
+    CSFIM -- "JOIN par ObjectID/MVObjectID" --> MVF
+    MVF -- "Export\n151 flux (scripted)" --> CSFIM
+    CSFIM -- "Export" --> FP
+      </div>
+    </div>
+
+    <h3>Types d'objets CS synchronisés (14 types)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>CS Object Type</th><th>MV Object Type</th><th>Critère de jointure</th></tr></thead>
+        <tbody>
+          <tr><td><code>Country</code></td><td><code>country</code></td><td>csObjectID / MVObjectID</td></tr>
+          <tr><td><code>DetectedRuleEntry</code></td><td><code>detectedRuleEntry</code></td><td>csObjectID / MVObjectID</td></tr>
+          <tr><td><code>ExpectedRuleEntry</code></td><td><code>expectedRuleEntry</code></td><td>csObjectID / MVObjectID</td></tr>
+          <tr><td><code>Group</code></td><td><code>group</code></td><td>csObjectID / MVObjectID</td></tr>
+          <tr><td><code>LMG_BL</code></td><td><code>LMG_BL</code></td><td>csObjectID / MVObjectID</td></tr>
+          <tr><td><code>LMG_Company</code></td><td><code>LMG_Company</code></td><td>csObjectID / MVObjectID</td></tr>
+          <tr><td><code>LMG_Computer</code></td><td><code>computer</code></td><td>csObjectID / MVObjectID</td></tr>
+          <tr><td><code>LMG_Contact</code></td><td><code>LMG_contact</code></td><td>csObjectID / MVObjectID</td></tr>
+          <tr><td><code>LMG_ExchangeObject</code></td><td><code>LMG_exchangeObject</code></td><td>csObjectID / MVObjectID</td></tr>
+          <tr><td><code>LMG_ServiceAccount</code></td><td><code>LMG_serviceAccount</code></td><td>csObjectID / MVObjectID</td></tr>
+          <tr><td><code>LMG_Site</code></td><td><code>LMG_Site</code></td><td>csObjectID / MVObjectID</td></tr>
+          <tr><td><code>LMG_Unit</code></td><td><code>LMG_Unit</code></td><td>csObjectID / MVObjectID</td></tr>
+          <tr><td><code>Person</code></td><td><code>person</code></td><td>csObjectID / MVObjectID</td></tr>
+          <tr><td><code>SynchronizationRule</code></td><td><code>synchronizationRule</code></td><td>csObjectID / MVObjectID</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Profils d'exécution</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Profil</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><strong>DELTA Import</strong></td><td>Import des changements depuis le portail MIM</td></tr>
+          <tr><td><strong>DELTA Import and DELTA Synchro</strong></td><td>Import + synchronisation delta</td></tr>
+          <tr><td><strong>DELTA Synchro</strong></td><td>Synchronisation delta</td></tr>
+          <tr><td><strong>Export</strong></td><td>Export vers le portail MIM</td></tr>
+          <tr><td><strong>FULL Import</strong></td><td>Import complet du portail</td></tr>
+          <tr><td><strong>FULL Import and FULL Synchro</strong></td><td>Recharge complète + synchronisation</td></tr>
+          <tr><td><strong>FULL Synchro</strong></td><td>Resynchronisation complète</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- MDM RH -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-ma-rh">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>5. <s>MDM RH - Update New</s> — <span style="color:#ef9a9a">Obsolète</span></h2>
+    <span class="phase-badge badge-obsolete">Obsolète</span>
+  </button>
+  <div class="section-body open">
+    <p>Le <strong>MDM RH - Update New</strong> était le connecteur vers la source RH principale (iHris). Ce MA est désormais <strong style="color:#ef9a9a">obsolète</strong> et a été <strong>remplacé par MDM RH IRIS - MA</strong>, qui assure les mêmes fonctions avec des attributs étendus. Les informations ci-dessous sont conservées à titre de référence historique uniquement.</p>
+
+    <div class="callout callout-warn">
+      <span class="callout-icon">⚠️</span>
+      <div>Ce MA est <strong>obsolète</strong> et ne doit plus être utilisé en production. Il a été remplacé par <strong>MDM RH IRIS - MA</strong>. La configuration reste présente dans la SyncConfig à titre d'archive, mais les run profiles ne doivent plus être exécutés.</div>
+    </div>
+
+    <h3>Schéma CS (objet User)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Attribut CS</th><th>Correspondance AD/MV</th><th>Rôle</th></tr></thead>
+        <tbody>
+          <tr><td><code>EmployeeID</code></td><td>MV:<code>employeeID</code></td><td>Clé de jointure principale</td></tr>
+          <tr><td><code>SamAccountName</code></td><td>MV:<code>accountName</code></td><td>Identifiant de connexion</td></tr>
+          <tr><td><code>sn</code></td><td>MV:<code>lastName</code></td><td>Nom de famille</td></tr>
+          <tr><td><code>GivenName</code></td><td>MV:<code>firstName</code></td><td>Prénom</td></tr>
+          <tr><td><code>accountExpires</code></td><td>MV:<code>employeeEndDate</code></td><td>Date de fin de contrat</td></tr>
+          <tr><td><code>extensionAttribute6</code></td><td>MV:<code>LMG_extensionAttribute6</code></td><td>Type employé étendu</td></tr>
+          <tr><td><code>employeeType</code></td><td>MV:<code>employeeType</code></td><td>Catégorie employé</td></tr>
+          <tr><td><code>Title</code></td><td>MV:<code>jobTitle</code></td><td>Intitulé de poste</td></tr>
+          <tr><td><code>Department</code></td><td>MV:<code>department</code></td><td>Département</td></tr>
+          <tr><td><code>extensionAttribute9</code></td><td>MV:<code>companyCode</code></td><td>Code société</td></tr>
+          <tr><td><code>Company</code></td><td>MV:<code>company</code></td><td>Nom de la société</td></tr>
+          <tr><td><code>extensionAttribute4</code></td><td>MV:<code>LMG_unitCode</code></td><td>Code unité</td></tr>
+          <tr><td><code>o</code></td><td>MV:<code>LMG_unitName</code></td><td>Nom de l'unité</td></tr>
+          <tr><td><code>PostalCode</code></td><td>MV:<code>postalCode</code></td><td>Code postal</td></tr>
+          <tr><td><code>l</code></td><td>MV:<code>city</code></td><td>Ville</td></tr>
+          <tr><td><code>c</code></td><td>MV:<code>countryCode</code></td><td>Code pays</td></tr>
+          <tr><td><code>EmployeeID</code></td><td>MV:<code>employeeID</code></td><td>Matricule RH</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Profils d'exécution</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Profil</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><strong>DS</strong></td><td>Delta Synchronization — traitement des objets en attente</td></tr>
+          <tr><td><strong>FI</strong></td><td>Full Import — lecture complète du fichier CSV RH</td></tr>
+          <tr><td><strong>FS</strong></td><td>Full Synchronization — resynchronisation complète</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- MDM RH IRIS MA -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-ma-iris">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>6. MDM RH IRIS - MA — Source RH principale (iHris)</h2>
+    <span class="phase-badge badge-purple">Source RH Principale</span>
+  </button>
+  <div class="section-body open">
+    <p>Le <strong>MDM RH IRIS - MA</strong> est désormais le <strong>connecteur RH principal</strong> vers le système <strong>iHris</strong>. Il remplace entièrement le MA <em>MDM RH - Update New</em> (obsolète) et fournit l'ensemble des données d'identité des employés : informations nominatives, données de contrat (<code>accountStartDate</code>, <code>accountExpires</code>), codes référentiels organisationnels LMG (BL, Unit, Site) et informations linguistiques.</p>
+
+    <div class="callout callout-ok">
+      <span class="callout-icon">✅</span>
+      <div>Ce MA est la <strong>source autoritaire principale</strong> pour les identités employés. Il utilise <strong>Lithnet.Umare.RulesExtension.dll</strong> et effectue la jointure sur <code>MV:employeeID = CS:EmployeeID</code>.</div>
+    </div>
+
+    <h3>Attributs IRIS (source RH principale)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Attribut CS</th><th>Rôle</th></tr></thead>
+        <tbody>
+          <tr><td><code>accountStartDate</code></td><td>Date de début de contrat (EmployeeStartDate)</td></tr>
+          <tr><td><code>accountExpires</code></td><td>Date de fin de contrat</td></tr>
+          <tr><td><code>extensionAttribute5</code></td><td>Code BL (Business Line)</td></tr>
+          <tr><td><code>extensionAttribute8</code></td><td>Code site</td></tr>
+          <tr><td><code>preferredLanguage</code></td><td>Langue préférée</td></tr>
+          <tr><td><code>CountryCode</code></td><td>Code pays IRIS</td></tr>
+          <tr><td><code>extensionAttribute14</code></td><td>Attribut RH étendu 14</td></tr>
+          <tr><td><code>EmployeeID</code></td><td>Clé de jointure</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Profils d'exécution</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Profil</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><strong>DS</strong></td><td>Delta Synchronization</td></tr>
+          <tr><td><strong>FI</strong></td><td>Full Import</td></tr>
+          <tr><td><strong>FS</strong></td><td>Full Synchronization</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- MDM RH IRIS EXPORT -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-ma-iris-export">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>7. MDM RH IRIS - Export — Feedback MIM → iHris</h2>
+    <span class="phase-badge badge-orange">Export IRIS</span>
+  </button>
+  <div class="section-body open">
+    <p>Le <strong>MDM RH IRIS - Export</strong> est un connecteur en <strong>sortie uniquement</strong> : il exporte des données calculées par MIM vers le système iHris. Il s'agit d'un mécanisme de <strong>feedback</strong> : MIM renvoie vers la source RH les informations de compte AD créées (AccountName, UPN, mail...) pour que le système RH soit informé de l'identifiant AD alloué.</p>
+
+    <div class="callout callout-ok">
+      <span class="callout-icon">🔄</span>
+      <div>Ce flux de <strong>7 attributs</strong> ferme la boucle : iHris crée l'employé → MIM crée le compte AD → MIM renvoie le <code>AccountName</code> et l'<code>UPN</code> vers iHris pour traçabilité.</div>
+    </div>
+
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+flowchart LR
+    subgraph MV["🧠 Métaverse"]
+        MVA["person\n(accountName, employeeID\nemail, UPN, officePhone\nmobilePhone)"]
+    end
+    subgraph CS["CS — IRIS Export"]
+        CSA["User CS"]
+    end
+    subgraph IRIS["📤 iHris / MDM RH CSV Export"]
+        IRA["AccountName\nEmployeeID\nTelephoneNumber\nMobile\nmail\nUPN"]
+    end
+    MV -- "Export — 7 flux scripted\nJOIN: employeeID" --> CS
+    CS -- "Fichier CSV sortant" --> IRIS
+      </div>
+    </div>
+
+    <h3>Flux d'export détaillé (MV → CSV iHris)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Attribut CSV (cible)</th><th>Source MV</th><th>Rôle</th></tr></thead>
+        <tbody>
+          <tr><td><code>EmployeeID</code></td><td><code>employeeID</code></td><td>Clé de jointure (DN aussi)</td></tr>
+          <tr><td><code>AccountName</code></td><td><code>accountName</code></td><td>Login AD alloué par MIM</td></tr>
+          <tr><td><code>UPN</code></td><td><code>UserPrincipalName</code></td><td>UPN complet</td></tr>
+          <tr><td><code>mail</code></td><td><code>email</code></td><td>Adresse email principale</td></tr>
+          <tr><td><code>TelephoneNumber</code></td><td><code>officePhone</code></td><td>Téléphone bureau</td></tr>
+          <tr><td><code>Mobile</code></td><td><code>mobilePhone</code></td><td>Téléphone mobile</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Profils d'exécution</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Profil</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><strong>DS</strong></td><td>Delta Synchronization</td></tr>
+          <tr><td><strong>FI</strong></td><td>Full Import (lecture des CS existants)</td></tr>
+          <tr><td><strong>FS</strong></td><td>Full Synchronization</td></tr>
+          <tr><td><strong>EXPORT</strong></td><td>Export delta vers CSV</td></tr>
+          <tr><td><strong>FULL EXPORT</strong></td><td>Export complet vers CSV</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- MDM SITE -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-ma-site">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>8. MDM Site - MA — Référentiel des sites</h2>
+    <span class="phase-badge badge-teal">Référentiel</span>
+  </button>
+  <div class="section-body open">
+    <p>Le <strong>MDM Site - MA</strong> alimente le référentiel <strong>LMG_Site</strong> dans la Métaverse. Il importe les données de localisation des sites LMG à partir d'un fichier CSV et les joint via <code>siteCodeIT</code>.</p>
+
+    <h3>Schéma CS et jointure</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Attribut CS</th><th>MV Object / Attribut</th><th>Rôle</th></tr></thead>
+        <tbody>
+          <tr><td><code>siteCodeIT</code></td><td>LMG_Site : <code>siteCode</code></td><td>Clé de jointure</td></tr>
+          <tr><td><code>id</code></td><td><code>siteIdString</code></td><td>Identifiant site</td></tr>
+          <tr><td><code>commonName</code></td><td><code>displayName</code></td><td>Nom commun du site</td></tr>
+          <tr><td><code>legalName</code></td><td><code>description</code></td><td>Dénomination légale</td></tr>
+          <tr><td><code>street</code></td><td><code>address</code></td><td>Adresse postale</td></tr>
+          <tr><td><code>postalCode</code></td><td><code>postalCode</code></td><td>Code postal</td></tr>
+          <tr><td><code>city</code></td><td><code>city</code></td><td>Ville</td></tr>
+          <tr><td><code>state</code></td><td><code>LMG_state</code></td><td>État / Province</td></tr>
+          <tr><td><code>countryId</code></td><td><code>country_Id</code></td><td>Identifiant pays</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Profils d'exécution</h3>
+    <p>Profils : <strong>FI</strong> (Full Import), <strong>FS</strong> (Full Synchronization)</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- MDM COMPANY -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-ma-company">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>9. MDM Company - MA — Référentiel des entités juridiques</h2>
+    <span class="phase-badge badge-teal">Référentiel</span>
+  </button>
+  <div class="section-body open">
+    <p>Le <strong>MDM Company - MA</strong> alimente le référentiel <strong>LMG_Company</strong> dans la Métaverse. Il importe les données des entités légales LMG (sociétés) et les joint sur <code>legalEntityID</code> = <code>company_ID</code>.</p>
+
+    <h3>Schéma CS et jointure</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Attribut CS</th><th>MV Object / Attribut</th><th>Rôle</th></tr></thead>
+        <tbody>
+          <tr><td><code>legalEntityID</code></td><td>LMG_Company : <code>company_ID</code></td><td>Clé de jointure</td></tr>
+          <tr><td><code>legalEntityCode</code></td><td><code>companyCode</code></td><td>Code société</td></tr>
+          <tr><td><code>LegalEntityCommonName</code></td><td><code>displayName</code></td><td>Nom commun</td></tr>
+          <tr><td><code>legalEntityName</code></td><td><code>description</code></td><td>Dénomination légale</td></tr>
+          <tr><td><code>headquartersAddressCountry</code></td><td><code>country</code></td><td>Pays du siège</td></tr>
+          <tr><td><code>IsExternal</code></td><td><code>type</code></td><td>Indicateur externe/interne</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Profils d'exécution</h3>
+    <p>Profils : <strong>FI</strong> (Full Import), <strong>FS</strong> (Full Synchronization)</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- MDM UNITS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-ma-unit">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>10. MDM - Units - MA — Référentiel des unités (BL/BU)</h2>
+    <span class="phase-badge badge-teal">Référentiel</span>
+  </button>
+  <div class="section-body open">
+    <p>Le <strong>MDM - Units - MA</strong> alimente le référentiel <strong>LMG_Unit</strong> (et indirectement <strong>LMG_BL</strong>) dans la Métaverse. Les unités représentent la structure organisationnelle LMG : Business Lines (BL) et Business Units (BU/Unit).</p>
+
+    <h3>Schéma CS et jointure</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Attribut CS</th><th>MV Object / Attribut</th><th>Rôle</th></tr></thead>
+        <tbody>
+          <tr><td><code>UnitCode</code></td><td>LMG_Unit : <code>LMG_unitCode</code></td><td>Clé de jointure</td></tr>
+          <tr><td><code>UnitName</code></td><td><code>LMG_unitName</code></td><td>Nom de l'unité</td></tr>
+          <tr><td><code>UnitStatus</code></td><td><code>LMG_unitStatus</code></td><td>Statut actif/inactif</td></tr>
+          <tr><td><code>BLCode</code></td><td><code>LMG_unitBLCode</code></td><td>Code Business Line parent</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Profils d'exécution</h3>
+    <p>Profils : <strong>FI</strong> (Full Import), <strong>FS</strong> (Full Synchronization)</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- MDM COUNTRY -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-ma-country">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>11. MDM Country — Référentiel des pays</h2>
+    <span class="phase-badge badge-teal">Référentiel</span>
+  </button>
+  <div class="section-body open">
+    <p>Le <strong>MDM Country</strong> alimente le référentiel <strong>country</strong> dans la Métaverse. Il charge la table des pays via un fichier délimité (CSV). La jointure se fait sur <code>country_Id</code> = <code>num</code> (code numérique ISO).</p>
+
+    <h3>Schéma CS</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Attribut CS</th><th>MV Attribut</th><th>Rôle</th></tr></thead>
+        <tbody>
+          <tr><td><code>num</code></td><td><code>country_Id</code></td><td>Code numérique — clé de jointure</td></tr>
+          <tr><td><code>alpha2</code></td><td><code>countryCode</code></td><td>Code ISO-2 lettres (ex: FR)</td></tr>
+          <tr><td><code>name</code></td><td><code>displayName</code></td><td>Nom du pays</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Profils d'exécution</h3>
+    <p>Profils : <strong>DELTA Import and DELTA Synchro</strong>, <strong>FULL Import and FULL Synchro</strong>, <strong>FULL Synchro</strong></p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- MDM RÉCONCILIATION -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-ma-recon">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>12. MDM RH - Reconciliation — Réconciliation des données</h2>
+    <span class="phase-badge badge-grey">Reconciliation</span>
+  </button>
+  <div class="section-body open">
+    <p>Le <strong>MDM RH - Reconciliation</strong> est un connecteur délimité (CSV) utilisé pour des opérations de <strong>réconciliation</strong> des données RH. Il gère les cas où une correspondance partielle ou manuelle est nécessaire entre les enregistrements RH et les objets MV existants.</p>
+
+    <div class="callout callout-warn">
+      <span class="callout-icon">⚠️</span>
+      <div>La jointure utilise <code>MV:LMG_country_ID = CS:countryCode</code> — ce qui est inhabituel pour un MA RH. Il s'agit probablement d'un mécanisme de correspondance secondaire ou de réconciliation de données géographiques associées aux personnes.</div>
+    </div>
+
+    <h3>Schéma CS (objet person)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Attributs CS principaux</th><th>Rôle</th></tr></thead>
+        <tbody>
+          <tr><td><code>EmployeeID</code></td><td>Matricule RH</td></tr>
+          <tr><td><code>SamAccountName</code></td><td>Login AD</td></tr>
+          <tr><td><code>sn</code>, <code>GivenName</code></td><td>Nom / Prénom</td></tr>
+          <tr><td><code>accountExpires</code></td><td>Expiration du compte</td></tr>
+          <tr><td><code>employeeType</code></td><td>Type d'employé</td></tr>
+          <tr><td><code>countryCode</code></td><td>Code pays (clé de jointure secondaire)</td></tr>
+          <tr><td><code>extensionAttribute6</code>, <code>extensionAttribute9</code></td><td>Attributs étendus RH</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Profils d'exécution</h3>
+    <p>Profils : <strong>FI</strong> (Full Import), <strong>FS</strong> (Full Synchronization)</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- FLUX D'ATTRIBUTS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-flows">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>13. Synthèse des flux d'attributs</h2>
+    <span class="phase-badge badge-blue">Flux globaux</span>
+  </button>
+  <div class="section-body open">
+    <p>Vue synthétique de tous les flux d'attributs entre les systèmes connectés et la Métaverse, en import (CS→MV) et export (MV→CS).</p>
+
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+flowchart TD
+    subgraph IMPORT_FLOWS["📥 Flux Import (Sources → Métaverse)"]
+        direction LR
+        I1["⚠️ MDM RH - Update New\n(OBSOLÈTE — remplacé par IRIS MA)\nEmployeeID, SamAccountName, sn, GivenName\naccountExpires, employeeType, Department\nCompany, extensionAttribute*, l, c..."]
+        I2["MDM RH IRIS - MA\naccountStartDate, extensionAttribute5\nextensionAttribute8, preferredLanguage\nCountryCode, EmployeeID"]
+        I3["MDM Site - MA\nsiteCodeIT→siteCode, commonName\nstreet, city, postalCode, countryId"]
+        I4["MDM Company - MA\nlegalEntityID→company_ID\nlegalEntityCode, legalEntityName\nheadquartersAddressCountry"]
+        I5["MDM Units - MA\nUnitCode→LMG_unitCode\nUnitName, UnitStatus, BLCode"]
+        I6["MDM Country\nnum→country_Id, alpha2, name"]
+    end
+
+    MV["🧠 Métaverse\n(person, group, LMG_Site\nLMG_Company, LMG_Unit\ncountry...)"]
+
+    subgraph EXPORT_FLOWS["📤 Flux Export (Métaverse → Cibles)"]
+        direction LR
+        E1["AD MA → Active Directory\n51 flux : sAMAccountName, UPN, unicodePwd\ndisplayName, givenName, sn, mail\nextensionAttribute1-15, accountExpires..."]
+        E2["FIM MA → FIM Portal\n151 flux : Person, Group\nSynchronizationRule, LMG_*\ndetectedRuleEntry, expectedRuleEntry..."]
+        E3["IRIS Export → iHris CSV\n7 flux : AccountName, UPN, mail\nEmployeeID, TelephoneNumber, Mobile"]
+    end
+
+    I1 -. "obsolète" .-> MV
+    I2 --> MV
+    I3 --> MV
+    I4 --> MV
+    I5 --> MV
+    I6 --> MV
+    MV --> E1
+    MV --> E2
+    MV --> E3
+      </div>
+    </div>
+
+    <h3>Tableau récapitulatif par MA</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Management Agent</th><th>Type</th><th>Direction</th><th>Flows Import</th><th>Flows Export</th><th>Obj. CS</th></tr></thead>
+        <tbody>
+          <tr><td><strong>AD MA</strong></td><td><span class="ma-type ma-type-ad">AD</span></td><td><span class="flow-both">↕ Bidirectionnel</span></td><td>Feedback (LMG_FromAD_*)</td><td>51 attrs vers AD</td><td>user, group, contact, computer</td></tr>
+          <tr><td><strong>FIM MA</strong></td><td><span class="ma-type ma-type-fim">FIM</span></td><td><span class="flow-both">↕ Bidirectionnel</span></td><td>Changements portail</td><td>151 attrs vers FIM</td><td>Person, Group, LMG_*, SyncRule</td></tr>
+          <tr class="obsolete-row"><td><strong><s>MDM RH - Update New</s></strong> <span class="phase-badge badge-obsolete">Obsolète</span></td><td><span class="ma-type ma-type-ecma">ECMA2</span></td><td><span class="flow-in">↓ Import</span></td><td>~17 attrs RH</td><td>0</td><td>User</td></tr>
+          <tr><td><strong>MDM RH IRIS - MA</strong></td><td><span class="ma-type ma-type-ecma">ECMA2</span></td><td><span class="flow-in">↓ Import</span></td><td>~8 attrs IRIS</td><td>0</td><td>User</td></tr>
+          <tr><td><strong>MDM RH IRIS - Export</strong></td><td><span class="ma-type ma-type-ecma">ECMA2</span></td><td><span class="flow-out">↑ Export</span></td><td>0</td><td>7 attrs feedback</td><td>User</td></tr>
+          <tr><td><strong>MDM Site - MA</strong></td><td><span class="ma-type ma-type-ecma">ECMA2</span></td><td><span class="flow-in">↓ Import</span></td><td>9 attrs site</td><td>0</td><td>User (LMG_Site)</td></tr>
+          <tr><td><strong>MDM Company - MA</strong></td><td><span class="ma-type ma-type-ecma">ECMA2</span></td><td><span class="flow-in">↓ Import</span></td><td>6 attrs company</td><td>0</td><td>User (LMG_Company)</td></tr>
+          <tr><td><strong>MDM - Units - MA</strong></td><td><span class="ma-type ma-type-ecma">ECMA2</span></td><td><span class="flow-in">↓ Import</span></td><td>4 attrs unit</td><td>0</td><td>User (LMG_Unit)</td></tr>
+          <tr><td><strong>MDM Country</strong></td><td><span class="ma-type ma-type-delim">CSV</span></td><td><span class="flow-in">↓ Import</span></td><td>3 attrs pays</td><td>0</td><td>country</td></tr>
+          <tr><td><strong>MDM RH - Reconciliation</strong></td><td><span class="ma-type ma-type-delim">CSV</span></td><td><span class="flow-in">↓ Import</span></td><td>~20 attrs</td><td>0</td><td>person</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- RÈGLES DE JOINTURE -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-join">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>14. Règles de jointure et de projection</h2>
+    <span class="phase-badge badge-green">Join / Projection</span>
+  </button>
+  <div class="section-body open">
+    <p>Les règles de jointure définissent comment un objet dans un Connector Space (CS) est <strong>lié</strong> à un objet existant dans la Métaverse. La projection définit comment un objet CS crée un <strong>nouvel objet</strong> dans la MV.</p>
+
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+flowchart TD
+    subgraph JOIN_LOGIC["🔗 Logique de Jointure"]
+        J1["⚠️ MDM RH - Update New\n(OBSOLÈTE)\nCS:User.EmployeeID\n= MV:person.employeeID\n(type: sync-rule)"]
+        J2["MDM RH IRIS - MA\nCS:User.EmployeeID\n= MV:person.employeeID\n(résolution: none → projeter)"]
+        J3["AD MA\nCS:user.objectGUID\n= MV:person.AD_objectGUID\n(type: sync-rule)"]
+        J4["AD MA\nCS:user.sAMAccountName\n= MV:LMG_serviceAccount.accountName\nou LMG_exchangeObject"]
+        J5["FIM MA\nMVObjectID bidirectionnel\n(14 types d'objets)"]
+        J6["MDM Site\nCS:siteCodeIT\n= MV:LMG_Site.siteCode"]
+        J7["MDM Company\nCS:legalEntityID\n= MV:LMG_Company.company_ID"]
+        J8["MDM Units\nCS:UnitCode\n= MV:LMG_Unit.LMG_unitCode"]
+        J9["MDM Country\nCS:num\n= MV:country.country_Id"]
+    end
+      </div>
+    </div>
+
+    <div class="callout callout-info">
+      <span class="callout-icon">ℹ️</span>
+      <div><strong>Sync-Rule join</strong> : La logique de jointure est déléguée aux Synchronization Rules définies dans le portail MIM. Cela permet une gestion plus flexible qu'avec les join rules classiques directement dans le MA.</div>
+    </div>
+
+    <h3>Résumé des clés de jointure</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>MA</th><th>CS Attribute</th><th>MV Attribute</th><th>MV Object Type</th><th>Type de résolution</th></tr></thead>
+        <tbody>
+          <tr class="obsolete-row"><td><s>MDM RH - Update New</s> <span class="phase-badge badge-obsolete">Obsolète</span></td><td><code>EmployeeID</code></td><td><code>employeeID</code></td><td>person</td><td>Sync-Rule</td></tr>
+          <tr><td>MDM RH IRIS - MA</td><td><code>EmployeeID</code></td><td><code>employeeID</code></td><td>person</td><td>None (projection)</td></tr>
+          <tr><td>MDM RH IRIS - Export</td><td><code>EmployeeID</code></td><td><code>employeeID</code></td><td>person</td><td>None</td></tr>
+          <tr><td>AD MA (user→person)</td><td><code>objectGUID</code></td><td><code>AD_objectGUID</code></td><td>person</td><td>Sync-Rule</td></tr>
+          <tr><td>AD MA (user→serviceAccount)</td><td><code>sAMAccountName</code></td><td><code>accountName</code></td><td>LMG_serviceAccount</td><td>Sync-Rule</td></tr>
+          <tr><td>AD MA (user→exchangeObject)</td><td><code>sAMAccountName</code></td><td><code>accountName</code></td><td>LMG_exchangeObject</td><td>Sync-Rule</td></tr>
+          <tr><td>FIM MA</td><td><code>MVObjectID</code></td><td><code>csObjectID</code></td><td>14 types</td><td>Bidirectionnel</td></tr>
+          <tr><td>MDM Site - MA</td><td><code>siteCodeIT</code></td><td><code>siteCode</code></td><td>LMG_Site</td><td>LMG_Site</td></tr>
+          <tr><td>MDM Company - MA</td><td><code>legalEntityID</code></td><td><code>company_ID</code></td><td>LMG_Company</td><td>LMG_Company</td></tr>
+          <tr><td>MDM - Units - MA</td><td><code>UnitCode</code></td><td><code>LMG_unitCode</code></td><td>LMG_Unit</td><td>LMG_Unit</td></tr>
+          <tr><td>MDM Country</td><td><code>num</code></td><td><code>country_Id</code></td><td>country</td><td>Sync-Rule</td></tr>
+          <tr><td>MDM RH - Reconciliation</td><td><code>countryCode</code></td><td><code>LMG_country_ID</code></td><td>person</td><td>Sync-Rule</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PROFILS D'EXÉCUTION -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-runprofiles">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>15. Profils d'exécution — Cycle opérationnel</h2>
+    <span class="phase-badge badge-grey">Opérationnel</span>
+  </button>
+  <div class="section-body open">
+    <p>Les profils d'exécution définissent les opérations de synchronisation. La séquence typique d'un cycle complet de synchronisation est :</p>
+
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+flowchart LR
+    subgraph CYCLE["⚙️ Cycle de synchronisation typique"]
+        direction LR
+        S1["1. FI/DI\nImport depuis\ntoutes les sources\n(RH, AD, FIM, Sites...)"]
+        S2["2. FS/DS\nSynchronisation\nMétaverse\n(règles, jointure,\nflux d'attributs)"]
+        S3["3. Export\nAD MA Export\n→ Active Directory"]
+        S4["4. Export\nFIM MA Export\n→ FIM Portal"]
+        S5["5. Export\nIRIS Export\n→ iHris CSV"]
+        S6["6. DI + DS\nAD MA : Delta Import\n+ Delta Synchro\n(confirmation export AD)"]
+        S7["7. DI + DS\nFIM MA : Delta Import\n+ Delta Synchro\n(confirmation export FIM)"]
+    end
+
+    S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7
+      </div>
+    </div>
+
+    <h3>Tableau des profils par MA</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Management Agent</th><th>Profils disponibles</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>AD MA</strong></td>
+            <td><code>DELTA Import</code>, <code>DELTA Import and DELTA Synchro</code>, <code>DELTA Synchro</code>, <code>Export</code>, <code>FULL Import</code>, <code>Full Import and Full Synchro</code>, <code>FULL Synchro</code></td>
+            <td>Cycle complet. L'export est critique (password sync)</td>
+          </tr>
+          <tr>
+            <td><strong>FIM MA</strong></td>
+            <td><code>DELTA Import</code>, <code>DELTA Import and DELTA Synchro</code>, <code>DELTA Synchro</code>, <code>Export</code>, <code>FULL Import</code>, <code>FULL Import and FULL Synchro</code>, <code>FULL Synchro</code></td>
+            <td>Bidirectionnel avec le portail MIM</td>
+          </tr>
+          <tr class="obsolete-row">
+            <td><strong><s>MDM RH - Update New</s></strong> <span class="phase-badge badge-obsolete">Obsolète</span></td>
+            <td><code>DS</code>, <code>FI</code>, <code>FS</code></td>
+            <td>Import uniquement — <em>MA obsolète, remplacé par MDM RH IRIS - MA</em></td>
+          </tr>
+          <tr>
+            <td><strong>MDM RH IRIS - MA</strong></td>
+            <td><code>DS</code>, <code>FI</code>, <code>FS</code></td>
+            <td>Import uniquement</td>
+          </tr>
+          <tr>
+            <td><strong>MDM RH IRIS - Export</strong></td>
+            <td><code>DS</code>, <code>FI</code>, <code>FS</code>, <code>EXPORT</code>, <code>FULL EXPORT</code></td>
+            <td>Export du feedback vers iHris</td>
+          </tr>
+          <tr>
+            <td><strong>MDM Site - MA</strong></td>
+            <td><code>FI</code>, <code>FS</code></td>
+            <td>Import référentiel sites</td>
+          </tr>
+          <tr>
+            <td><strong>MDM Company - MA</strong></td>
+            <td><code>FI</code>, <code>FS</code></td>
+            <td>Import référentiel sociétés</td>
+          </tr>
+          <tr>
+            <td><strong>MDM - Units - MA</strong></td>
+            <td><code>FI</code>, <code>FS</code></td>
+            <td>Import référentiel unités</td>
+          </tr>
+          <tr>
+            <td><strong>MDM Country</strong></td>
+            <td><code>DELTA Import and DELTA Synchro</code>, <code>FULL Import and FULL Synchro</code>, <code>FULL Synchro</code></td>
+            <td>Import référentiel pays</td>
+          </tr>
+          <tr>
+            <td><strong>MDM RH - Reconciliation</strong></td>
+            <td><code>FI</code>, <code>FS</code></td>
+            <td>Réconciliation données RH</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-warn">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>Ordre d'exécution :</strong> Les imports des référentiels (Site, Company, Unit, Country) doivent être effectués <em>avant</em> les imports RH pour que les données organisationnelles soient disponibles lors de la synchronisation des personnes.</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- fin main-content -->
+
+<!-- ── Modal plein écran ── -->
+<div id="diag-modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-inner">
+    <div class="modal-toolbar">
+      <span class="modal-title" id="modal-ttl">Diagramme</span>
+      <div class="modal-actions">
+        <button onclick="zoomDiag(0.2)">＋ Zoom</button>
+        <button onclick="zoomDiag(-0.2)">－ Zoom</button>
+        <button onclick="zoomReset()">↺ Reset</button>
+        <span class="zoom-lbl" id="zoom-lbl">100%</span>
+        <button onclick="closeModal()">✕ Fermer</button>
+      </div>
+    </div>
+    <div class="modal-body" id="modal-body">
+      <div id="modal-svg-el"></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Document généré le 19 Mars 2026 &nbsp;|&nbsp; Serveur : SVMIMGLOASP01 &nbsp;|&nbsp; MIM SyncConfig — LMG &nbsp;|&nbsp;
+  <a href="LMG_User_Lifecycle.html">← Cycle de vie utilisateur</a> &nbsp;|&nbsp;
+  <a href="LMG_SyncConfig_Metaverse_EN.html">🇬🇧 English version</a>
+</footer>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: 'dark',
+    themeVariables: {
+      darkMode: true,
+      background: '#0d1117',
+      primaryColor: '#1565c0',
+      primaryTextColor: '#e0e0e0',
+      primaryBorderColor: '#2196f3',
+      lineColor: '#546e7a',
+      secondaryColor: '#1e1e1e',
+      tertiaryColor: '#2a2a2a'
+    },
+    flowchart: { htmlLabels: true, curve: 'basis' }
+  });
+
+  let _scale = 1, _baseW = 1400;
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Rendu Mermaid
+    await mermaid.run({ querySelector: '.mermaid' });
+
+    // Injection bouton Agrandir sur chaque diagramme
+    document.querySelectorAll('.mermaid-wrap').forEach(wrap => {
+      const svg = wrap.querySelector('svg');
+      if (!svg) return;
+      const btn = document.createElement('button');
+      btn.className = 'expand-btn';
+      btn.textContent = '⛶ Agrandir';
+      btn.addEventListener('click', () => openDiagram(wrap));
+      wrap.appendChild(btn);
+    });
+
+    // Navbar active state
+    const sections = document.querySelectorAll('.section');
+    const navLinks = document.querySelectorAll('.navbar a');
+    window.addEventListener('scroll', () => {
+      let cur = '';
+      sections.forEach(s => {
+        if (window.scrollY >= s.offsetTop - 60) cur = s.id;
+      });
+      navLinks.forEach(a => {
+        a.classList.toggle('active', a.getAttribute('href') === '#' + cur);
+      });
+    });
+
+    // Mousewheel zoom dans la modal
+    document.getElementById('modal-body').addEventListener('wheel', e => {
+      e.preventDefault();
+      zoomDiag(e.deltaY < 0 ? 0.15 : -0.15);
+    }, { passive: false });
+  });
+
+  function toggle(btn) {
+    const body = btn.nextElementSibling;
+    const arrow = btn.querySelector('.toggle');
+    body.classList.toggle('open');
+    if (arrow) arrow.style.transform = body.classList.contains('open') ? '' : 'rotate(-90deg)';
+  }
+
+  function openDiagram(wrap) {
+    const svg = wrap.querySelector('svg');
+    if (!svg) return;
+
+    const sec = wrap.closest('.section');
+    document.getElementById('modal-ttl').textContent =
+      sec ? sec.querySelector('h2').textContent.trim() : 'Diagramme';
+
+    const vb = svg.getAttribute('viewBox');
+    if (vb) {
+      const parts = vb.trim().split(/[\s,]+/);
+      _baseW = parts.length >= 4 ? Math.max(parseInt(parts[2]) || 1400, 900) : 1400;
+    } else {
+      _baseW = parseInt(svg.getAttribute('width')) || 1400;
+    }
+
+    const clone = svg.cloneNode(true);
+    clone.style.cssText = `width:${_baseW}px;height:auto;display:block`;
+    const el = document.getElementById('modal-svg-el');
+    el.innerHTML = '';
+    el.appendChild(clone);
+
+    _scale = 1;
+    document.getElementById('zoom-lbl').textContent = '100%';
+    document.getElementById('diag-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('diag-modal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function zoomDiag(delta) {
+    _scale = Math.min(5, Math.max(0.2, _scale + delta));
+    const svg = document.querySelector('#modal-svg-el svg');
+    if (svg) svg.style.width = Math.round(_baseW * _scale) + 'px';
+    document.getElementById('zoom-lbl').textContent = Math.round(_scale * 100) + '%';
+  }
+
+  function zoomReset() {
+    _scale = 1;
+    const svg = document.querySelector('#modal-svg-el svg');
+    if (svg) svg.style.width = _baseW + 'px';
+    document.getElementById('zoom-lbl').textContent = '100%';
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>

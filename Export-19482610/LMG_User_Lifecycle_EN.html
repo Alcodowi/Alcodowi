@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>User Lifecycle — LMG (MIM) — March 2026</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{
+  --bg:#121212;--bg2:#1e1e1e;--bg3:#2a2a2a;--border:#333;
+  --text:#e0e0e0;--text2:#aaa;--ok:#4caf50;--warn:#ff9800;--crit:#f44336;
+  --accent:#2196f3;--accent2:#1565c0;--purple:#9c27b0
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:13px;display:flex;flex-direction:column;min-height:100vh}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── Header ── */
+header{background:var(--accent2);padding:16px 24px;border-bottom:3px solid var(--accent);flex-shrink:0}
+header h1{font-size:20px;font-weight:700;color:#fff}
+header p{color:#cce;font-size:11px;margin-top:3px}
+
+/* ── Navbar ── */
+.navbar{position:sticky;top:0;background:var(--bg2);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 12px;overflow-x:auto;overflow-y:hidden;flex-shrink:0;height:42px;z-index:100}
+.navbar-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-right:8px;white-space:nowrap;flex-shrink:0}
+.navbar a{display:inline-block;padding:6px 10px;color:var(--text2);text-decoration:none;font-size:11px;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s}
+.navbar a:hover{color:var(--text);background:var(--bg3);border-bottom-color:var(--accent)}
+.navbar a.active{color:var(--accent);border-bottom-color:var(--accent);background:rgba(33,150,243,.08)}
+.navbar-sep{border:none;border-left:1px solid var(--border);height:24px;margin:0 2px;flex-shrink:0}
+
+/* ── Summary bar ── */
+.summary-bar{display:flex;flex-wrap:wrap;gap:10px;padding:14px 20px;background:var(--bg2);border-bottom:1px solid var(--border)}
+.card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px 16px;min-width:110px;text-align:center}
+.card .num{font-size:22px;font-weight:700;color:var(--accent)}
+.card .lbl{font-size:10px;color:var(--text2);margin-top:3px}
+.card.green .num{color:var(--ok)}
+.card.orange .num{color:var(--warn)}
+.card.red .num{color:var(--crit)}
+.card.purple .num{color:#ce93d8}
+
+/* ── Main layout ── */
+.main-content{flex:1;padding:0 0 40px}
+
+/* ── Collapsible sections ── */
+.section{border:1px solid var(--border);border-radius:6px;margin:10px 18px;overflow:hidden}
+.section-header{background:var(--bg2);padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;user-select:none;border:none;width:100%;text-align:left;transition:background .15s}
+.section-header:hover{background:var(--bg3)}
+.section-header h2{font-size:13px;font-weight:600;flex:1;color:var(--text)}
+.phase-badge{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:700;flex-shrink:0}
+.badge-green{background:rgba(76,175,80,.2);color:#81c784;border:1px solid #388e3c}
+.badge-blue{background:rgba(33,150,243,.2);color:#64b5f6;border:1px solid #1565c0}
+.badge-yellow{background:rgba(255,193,7,.15);color:#ffd54f;border:1px solid #f57f17}
+.badge-orange{background:rgba(255,152,0,.2);color:#ffb74d;border:1px solid #e65100}
+.badge-red{background:rgba(244,67,54,.2);color:#ef9a9a;border:1px solid #c62828}
+.badge-grey{background:rgba(96,125,139,.2);color:#b0bec5;border:1px solid #455a64}
+.badge-purple{background:rgba(156,39,176,.2);color:#ce93d8;border:1px solid #6a1b9a}
+.badge-cyan{background:rgba(0,188,212,.2);color:#80deea;border:1px solid #00838f}
+.toggle{font-size:16px;color:var(--accent);width:18px;text-align:center;flex-shrink:0;transition:transform .2s}
+.section-body{padding:14px 16px;display:none}
+.section-body.open{display:block}
+
+/* ── Tables ── */
+.table-wrap{overflow-x:auto;margin-bottom:12px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:var(--bg3);color:var(--text2);padding:5px 9px;text-align:left;border-bottom:2px solid var(--border);white-space:nowrap;position:sticky;top:0}
+td{padding:5px 9px;border-bottom:1px solid var(--border)}
+tr:hover td{background:rgba(255,255,255,.03)}
+td code,th code{background:#2a3040;padding:1px 4px;border-radius:3px;font-size:11px;color:#90caf9}
+.tag-create{color:#81c784}.tag-attr{color:#64b5f6}.tag-prov{color:#ce93d8}
+.tag-notif{color:#ffd54f}.tag-activ{color:#4fc3f7}.tag-block{color:#ffb74d}
+.tag-reset{color:#ff8a65}.tag-disable{color:#ef9a9a}.tag-delete{color:#b0bec5}
+.tag-perm{color:#a5d6a7}.tag-temp{color:#fff176}.tag-intperm{color:#90caf9}
+
+/* ── Callouts ── */
+.callout{display:flex;gap:10px;padding:10px 14px;border-radius:5px;margin:10px 0;font-size:12px;line-height:1.6}
+.callout-info{background:rgba(33,150,243,.1);border-left:3px solid var(--accent)}
+.callout-warn{background:rgba(255,152,0,.1);border-left:3px solid var(--warn)}
+.callout-crit{background:rgba(244,67,54,.1);border-left:3px solid var(--crit)}
+.callout-ok{background:rgba(76,175,80,.1);border-left:3px solid var(--ok)}
+.callout-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+
+/* ── Section prose ── */
+.section-body p{margin:8px 0;line-height:1.7;font-size:13px;color:#ccc}
+.section-body h3{font-size:12px;color:var(--text2);margin:14px 0 6px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.section-body strong{color:#fff}
+
+/* ── Mermaid ── */
+.mermaid-wrap{background:#0d1117;border:1px solid var(--border);border-radius:6px;padding:16px;margin:10px 0;overflow-x:auto;text-align:center}
+.mermaid-wrap .mermaid{display:inline-block;min-width:300px}
+
+/* ── Subsections ── */
+.subsection{margin:14px 0 8px;padding-left:10px;border-left:3px solid var(--border)}
+.subsection h3{margin:0 0 6px;font-size:13px;color:#90caf9;font-weight:600;border:none;text-transform:none;letter-spacing:0}
+
+/* ── Footer ── */
+footer{text-align:center;padding:14px;color:var(--text2);font-size:11px;border-top:1px solid var(--border);background:var(--bg2)}
+
+/* ── Expand button ── */
+.expand-btn{display:block;margin:8px auto 2px;background:rgba(33,150,243,.08);border:1px solid rgba(33,150,243,.25);color:#64b5f6;padding:4px 16px;border-radius:3px;cursor:pointer;font-size:11px;transition:all .15s}
+.expand-btn:hover{background:rgba(33,150,243,.2);border-color:var(--accent);color:#fff}
+
+/* ── Full-screen modal ── */
+#diag-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9000;align-items:center;justify-content:center}
+#diag-modal.open{display:flex}
+.modal-inner{background:#0d1520;border:1px solid var(--accent);border-radius:8px;width:96vw;height:94vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 0 80px rgba(0,0,0,.9)}
+.modal-toolbar{display:flex;align-items:center;padding:8px 14px;background:var(--bg3);border-bottom:1px solid var(--border);gap:6px;flex-shrink:0}
+.modal-title{flex:1;font-size:13px;font-weight:600;color:#90caf9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.modal-actions{display:flex;gap:5px;align-items:center;flex-shrink:0}
+.modal-actions button{background:var(--bg2);border:1px solid var(--border);color:var(--text2);padding:4px 10px;border-radius:3px;cursor:pointer;font-size:12px;white-space:nowrap}
+.modal-actions button:hover{color:var(--text);border-color:var(--accent)}
+.modal-actions .zoom-lbl{font-size:11px;color:var(--text2);min-width:38px;text-align:center}
+.modal-body{flex:1;overflow:auto;padding:28px;background:#080e1a}
+#modal-svg-el{display:inline-block;min-width:100%}
+#modal-svg-el svg{display:block;height:auto !important}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔄 User Lifecycle — LMG</h1>
+  <p>Microsoft Identity Manager (MIM) &nbsp;|&nbsp; Exported: March 2026 &nbsp;|&nbsp; 13 documented phases &nbsp;|&nbsp; 36 referenced MPRs</p>
+</header>
+
+<div class="summary-bar">
+  <div class="card green"><div class="num">9</div><div class="lbl">Phases</div></div>
+  <div class="card"><div class="num">36</div><div class="lbl">Lifecycle MPRs</div></div>
+  <div class="card blue"><div class="num">13</div><div class="lbl">Diagrams</div></div>
+  <div class="card orange"><div class="num">1</div><div class="lbl">Disabled MPR ⚠️</div></div>
+  <div class="card purple"><div class="num">18</div><div class="lbl">Key Attributes</div></div>
+</div>
+
+<nav class="navbar">
+  <span class="navbar-title">Navigation</span>
+  <a href="#sec-overview">Overview</a>
+  <a href="#sec-phase1">Phase 1 — Creation</a>
+  <a href="#sec-phase2">Phase 2 — Attributes</a>
+  <a href="#sec-phase3">Phase 3 — AD Prov.</a>
+  <a href="#sec-phase4">Phase 4 — Activation</a>
+  <a href="#sec-phase5">Phase 5 — Active Life</a>
+  <a href="#sec-phase6">Phase 6 — Blocking</a>
+  <a href="#sec-phase7">Phase 7 — Pwd Reset</a>
+  <a href="#sec-phase8">Phase 8 — Deactivation</a>
+  <a href="#sec-phase9">Phase 9 — Deletion</a>
+  <hr class="navbar-sep">
+  <a href="#sec-emptype">EmployeeType</a>
+  <a href="#sec-attrs">Key Attributes</a>
+  <a href="#sec-ref">MPR Reference</a>
+</nav>
+
+<div class="main-content">
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- OVERVIEW -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-overview">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>1. User Lifecycle Overview</h2>
+    <span class="phase-badge badge-blue">Global</span>
+  </button>
+  <div class="section-body open">
+    <p>This document describes the complete lifecycle of a user resource in MIM: from its creation to permanent deletion, through all intermediate stages (AD provisioning, activation, blocking, deactivation, quarantine).</p>
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+flowchart TD
+    SRC["📥 HR Source (iHris)\nor manual MIM creation"]
+
+    subgraph CREATION["🟢 PHASES 1-3 : Creation"]
+        C1["Entry into MIM\n(Person object created)"]
+        C2["Flag initialization\n& calculated attributes"]
+        C3["Unique AccountName\nInitialPassword\nDNAD"]
+        C4["AD Provisioning\n(SyncRule → AD)"]
+        C5["Manager notification\n(initial password)"]
+    end
+
+    subgraph ACTIVATION["🔵 PHASE 4 : Activation"]
+        A1["D-10 before StartDate\nor ForceEnable=True"]
+        A2["ACTIVE account\n(Visible=True, AccountEnabled)"]
+        A3["O365 License activated"]
+    end
+
+    subgraph VIE["⚡ PHASE 5 : Active Life"]
+        V1["Attribute updates\n(Company, Site, Unit, Manager...)"]
+        V2["Synchronization\niHris / referentials"]
+    end
+
+    subgraph BLOCAGE["🟠 PHASE 6 : Manual Blocking"]
+        BL1["LMG_BlockAccount = True"]
+        BL2["Account disabled\n+ Password reset (Red Button)"]
+    end
+
+    subgraph DISABLE["🔴 PHASES 7-8 : Deactivation"]
+        D1["EmployeeEndDate < Today\n(Visible=True)"]
+        D2["INACTIVE account\n(moved to Quarantine OU)"]
+    end
+
+    subgraph DELETE["⚫ PHASE 9 : Deletion"]
+        DEL1["EmployeeEndDate + 180 days\n+ in Quarantine OU"]
+        DEL2["Resource deleted from MIM\n(and AD)"]
+    end
+
+    SRC --> C1
+    C1 --> C2 --> C3 --> C4 --> C5
+    C5 --> A1 --> A2 --> A3
+    A3 --> VIE
+    VIE --> BL1
+    BL1 --> BL2
+    BL2 -->|"LMG_BlockAccount = False\nor ForceEnable"| A2
+    VIE --> D1 --> D2
+    D2 -->|"EndDate pushed\ninto the future"| A2
+    D2 --> DEL1 --> DEL2
+
+    style CREATION fill:#1a2e1a,stroke:#2e7d32
+    style ACTIVATION fill:#0d1f3c,stroke:#1565c0
+    style VIE fill:#2a2a00,stroke:#f9a825
+    style BLOCAGE fill:#2a1a00,stroke:#e65100
+    style DISABLE fill:#2a0a0a,stroke:#c62828
+    style DELETE fill:#1a1a1a,stroke:#455a64
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PHASE 1 — CREATION -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-phase1">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>2. Phase 1 — Creation and Initialization</h2>
+    <span class="phase-badge badge-green">🟢 Creation</span>
+  </button>
+  <div class="section-body open">
+
+    <div class="subsection">
+      <h3>User sources</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Source</th><th>Mechanism</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><strong>iHris (HRIS)</strong></td><td>MIM Sync synchronization</td><td>Authoritative source for permanent and temporary employees. HR data (name, first name, employee ID, site, company, contract) arrive via the iHris connector.</td></tr>
+            <tr><td><strong>Manual creation</strong></td><td>MIM Portal</td><td>An administrator or HR creates the object directly in the MIM portal.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>Creation trigger</h3>
+      <div class="mermaid-wrap">
+        <div class="mermaid">
+flowchart LR
+    NEW["New Person object\ncreated in MIM"]
+    NEW -->|"Create Request"| MPR1["📋 MPR: Init Flags\n(Request · Create)"]
+    NEW -->|"Joins the Set"| SET1["Set: All LMG Users not admin\n/Person[not(LMG_isAdmin='true')]"]
+    SET1 -->|"Set Transition"| MPR2["📋 MPR: User Creation\n(SetTransition)"]
+    MPR1 --> WF1["⚡ Initialization Flags\n→ UpdateResources\n(internal flags initialized)"]
+    MPR2 --> WF2["⚡ Set default employee end date\n→ Calculation by EmployeeType"]
+    MPR2 --> WF3["⚡ Calculate DisplayName\n→ UpdateResources + FunctionActivity"]
+    MPR2 --> WF4["⚡ Calculate AccountName\n→ GenerateUniqueValue + UpdateResources"]
+    MPR2 --> WF5["⚡ Generate initial password\n→ UpdateResources"]
+    MPR2 --> WF6["⚡ Set AD Account Status\n→ UpdateResources"]
+    MPR2 --> WF7["⚡ Set Inactive\n→ FunctionActivity (account disabled at start)"]
+    MPR2 --> WF8["⚡ Set Visible to True\n→ UpdateResources (made visible in MIM)"]
+    MPR2 --> WF9["⚡ Calculate DatetimeUTC from Enddate"]
+    MPR2 --> WF10["⚡ Update ManagerID from ManagerRef"]
+    style MPR1 fill:#3d1a1a,stroke:#e74c3c
+    style MPR2 fill:#3d1a1a,stroke:#e74c3c
+    style SET1 fill:#1a2a3d,stroke:#2980b9
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>What happens at creation</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Step</th><th>Workflow</th><th>Result</th></tr></thead>
+          <tbody>
+            <tr><td>Flags initialized</td><td>Initialization Flags</td><td>LMG boolean attributes set to their default values</td></tr>
+            <tr><td>End date calculated</td><td>Set default employee end date</td><td><code>EmployeeEndDate</code> calculated by contract type</td></tr>
+            <tr><td>Display name</td><td>Calculate DisplayName</td><td><code>DisplayName</code> = FirstName + LASTNAME, with formatting rules</td></tr>
+            <tr><td>Account name</td><td>Calculate AccountName</td><td>Unique <code>AccountName</code> generated (GenerateUniqueValue), e.g. <code>jdupont</code></td></tr>
+            <tr><td>Initial password</td><td>Generate initial password</td><td><code>InitialPassword</code> generated and temporarily stored in MIM</td></tr>
+            <tr><td>AD status</td><td>Set AD Account Status</td><td><code>AccountEnabled</code> set in MIM</td></tr>
+            <tr><td>Inactive account</td><td>Set Inactive</td><td>Account started as <strong>inactive</strong> (FunctionActivity)</td></tr>
+            <tr><td>Visible</td><td>Set Visible to True</td><td><code>Visible = True</code> in MIM</td></tr>
+            <tr><td>ManagerID</td><td>Update ManagerID From ManagerRef</td><td>Bidirectional Manager/ManagerRef link synchronized</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="callout callout-info">
+      <span class="callout-icon">💡</span>
+      <div><strong>Important:</strong> At creation, the account is <strong>inactive</strong> (<code>Set Inactive</code>). It will only be activated D-10 before the <code>EmployeeStartDate</code>.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PHASE 2 — ATTRIBUTE CALCULATION -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-phase2">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>3. Phase 2 — Attribute Calculation</h2>
+    <span class="phase-badge badge-blue">🔵 Attributes</span>
+  </button>
+  <div class="section-body open">
+    <p>After creation, several <strong>Request</strong>-type MPRs trigger automatically to calculate derived attributes as soon as source data is available.</p>
+
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+flowchart TD
+    U["👤 Person object in MIM"]
+    U -->|"Company_ID set"| R1["📋 !LMG - User : Update LMG_CompanyRef when company_ID is updated\n→ Set LMG_Company from Company_ID\n→ Set Company Attributes from LMG_CompanyRef"]
+    U -->|"LMG_SiteID or SiteCode set"| R2["📋 !LMG - User : Update LMG_SiteRef when LMG_SiteID Change\n→ Set LMG_SiteRef from SiteID or SiteCode\n→ Set Site attributes from LMG_SiteRef"]
+    U -->|"LMG_UnitCode set"| R3["📋 !LMG - User : Update LMG_Unit when LMG_UnitCode Change\n→ Set LMG_Unit from LMG_UnitCode\n→ Set Unit attributes from LMG_UnitRef"]
+    U -->|"First or Last name changed"| R4["📋 !LMG - User : Update FirstName LastName\n→ Calculate DisplayName\n→ Calculate Email"]
+    U -->|"LMG_CompanyRef changed"| R5["📋 !LMG - User : Update Company Attributes when LMG_CompanyRef Change\n→ Calculate Email (domain @company)"]
+    U -->|"ManagerRef changed"| R6["📋 !LMG - User : Update ManagerID From ManagerRef\n→ ManagerID synchronized"]
+    U -->|"EmployeeEndDate changed"| R7["📋 !LMG - User : Define Enddate UTC Windows from Enddate\n→ Calculate DatetimeUTC from Enddate"]
+    U -->|"EmployeeType changed"| R8["📋 !LMG - User : Modification EmployeeType\n→ Set default employee end date"]
+    U -->|"LMG_PreferredLanguageRef changed"| R9["📋 !LMG - User : Change PreferredLanguage when LMG_PreferredLanguageRef Change\n→ Update PreferredLanguage"]
+    U -->|"Photo changed"| R10["📋 !LMG - User : Update Photo To Entra ID\n→ PowerShell → Upload to Entra ID"]
+    style U fill:#1a2a3d,stroke:#2980b9
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>Referential resolution chain</h3>
+      <div class="mermaid-wrap">
+        <div class="mermaid">
+flowchart LR
+    iHris["iHris (HR)"] -->|"Company_ID\nSiteCode / SiteID\nUnitCode"| MIM["MIM Person"]
+    MIM -->|"LMG_CompanyRef"| CMP["Company object\n(attributes copied\nto Person)"]
+    MIM -->|"LMG_SiteRef"| SIT["Site object\n(Country, Cluster, City\ncopied to Person)"]
+    MIM -->|"LMG_UnitRef"| UNT["Unit / BL object\n(attributes copied\nto Person)"]
+    CMP & SIT & UNT -->|"Email calculated\nDisplayName updated"| OUT["Final attributes\nready for AD"]
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PHASE 3 — AD PROVISIONING -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-phase3">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>4. Phase 3 — Active Directory Provisioning</h2>
+    <span class="phase-badge badge-purple">🟣 Provisioning</span>
+  </button>
+  <div class="section-body open">
+    <p>Once the object has its calculated attributes (AccountName, initial password, DNAD), it automatically enters the provisioning set.</p>
+
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+flowchart LR
+    COND["Conditions met:\n✅ AccountName calculated\n✅ InitialPassword generated\n✅ DNAD set\n✅ Not in Admin Set"]
+    COND --> SET2["Set: All LMG users Ready for AD provisioning\n/Person[starts-with(AccountName,'%')\nand starts-with(InitialPassword,'%')\nand starts-with(DNAD,'%')\nand not(LMG_RestoreAccount=True)]"]
+    SET2 -->|"Set Transition (entry)"| MPR3["📋 !LMG - User : Provisioning to AD\n(SetTransition)"]
+    MPR3 --> WF11["⚡ Provisioning to AD\n→ SynchronizationRuleActivity\n(Outbound sync rule → AD)"]
+    WF11 --> AD["Active Directory\n(object created in target OU)"]
+    SET2B["Set: All LMG Users in EntraID\n/Person[LMG_mS-DS-ConsistencyGuid='True']"]
+    AD -->|"Consistency GUID\nfrom AAD Connect"| SET2B
+    SET2B -->|"Set Transition"| MPR4["📋 !LMG - User : Set ADaccountstatus\n(SetTransition)"]
+    MPR4 --> WF12["⚡ Set ADAccountStatus\n→ UpdateResources"]
+    style COND fill:#1a2e1a,stroke:#27ae60
+    style AD fill:#1e1030,stroke:#9b59b6
+    style MPR3 fill:#3d1a1a,stroke:#e74c3c
+    style MPR4 fill:#3d1a1a,stroke:#e74c3c
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>Initial notification to manager</h3>
+      <p>As soon as the initial password is generated and the user is visible:</p>
+      <div class="mermaid-wrap">
+        <div class="mermaid">
+flowchart LR
+    SET3["Set: All users with initial password\n/Person[starts-with(InitialPassword,'%')\nand starts-with(DisplayName,'%')\nand Visible=True]"]
+    SET3 -->|"Set Transition"| MPR5["📋 !LMG - User : Notification - Manager new user\n(SetTransition)"]
+    MPR5 --> WF13["⚡ Notification Manager new user password\n→ AddDelay ⏱️\n→ RunPowerShellScript 📧\n(email to manager with password)"]
+    style MPR5 fill:#3d1a1a,stroke:#e74c3c
+        </div>
+      </div>
+      <div class="callout callout-info">
+        <span class="callout-icon">⏱️</span>
+        <div>The workflow includes a <strong>delay</strong> before sending, to ensure the AD account is ready.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PHASE 4 — ACTIVATION -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-phase4">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>5. Phase 4 — Account Activation</h2>
+    <span class="phase-badge badge-cyan">🔵 Activation</span>
+  </button>
+  <div class="section-body open">
+    <p>The account starts <strong>inactive</strong>. It is activated automatically via two mechanisms:</p>
+
+    <div class="subsection">
+      <h3>Mechanism 1 — Automatic Activation D-10</h3>
+      <div class="mermaid-wrap">
+        <div class="mermaid">
+flowchart LR
+    SET4["Set: Users - Start Date is in 10 days\n/Person[\nEmployeeStartDate < now()+10d\nand Visible=True]"]
+    SET4 -->|"Set Transition (entry)"| MPR6["📋 !LMG - User : Activate User\n(SetTransition)"]
+    MPR6 --> WF14["⚡ Set Active\n→ FunctionActivity\n(account activated in MIM and AD)"]
+    style MPR6 fill:#3d1a1a,stroke:#e74c3c
+    style SET4 fill:#1a2a3d,stroke:#2980b9
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>Mechanism 2 — Forced Activation (ForceEnable)</h3>
+      <div class="mermaid-wrap">
+        <div class="mermaid">
+flowchart LR
+    FLAG["Admin sets:\nLMG_ForceEnable = True"]
+    FLAG --> SET5["Set: All LMG Users not admin With ForceEnable to True\n/Person[LMG_ForceEnable=True]"]
+    SET5 -->|"Set Transition"| MPR7["📋 !LMG - User : Activate user - Force Enabled\n(SetTransition)"]
+    MPR7 --> WF15["⚡ Activate O365 Licence\n→ UpdateResources × 3\n(O365 license set)"]
+    MPR7 --> WF14B["⚡ Set Active\n→ FunctionActivity"]
+    style MPR7 fill:#3d1a1a,stroke:#e74c3c
+    style FLAG fill:#2a1800,stroke:#e67e22
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PHASE 5 — ACTIVE LIFE -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-phase5">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>6. Phase 5 — Active User Life</h2>
+    <span class="phase-badge badge-yellow">⚡ Active Life</span>
+  </button>
+  <div class="section-body open">
+    <p>During the active life, MPRs monitor attribute changes and propagate changes in cascade.</p>
+
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+flowchart TD
+    USER["👤 Active user in MIM + AD"]
+    USER -->|"Company change"| C["📋 !LMG - User : Update Company Attributes when LMG_CompanyRef Change\n→ Set Company Attributes from CompanyRef\n→ Email recalculated"]
+    USER -->|"Site / SiteID change"| S["📋 !LMG - User : Update Site attribute when LMG_SiteRef change\n→ Set LMG_SiteRef\n→ Set Site attributes\n(Country, City, Cluster updated)"]
+    USER -->|"Unit / UnitCode change"| U["📋 !LMG - User : Update Unit attributes when LMG_UnitRef change\n→ Set LMG_Unit\n→ Set Unit attributes"]
+    USER -->|"Manager change"| M["📋 !LMG - User : Update Manager Refence From ManagerID\n→ ManagerRef ↔ ManagerID sync"]
+    USER -->|"First/Last name change"| N["📋 !LMG - User : Update FirstName LastName\n→ Recalculate DisplayName + Email"]
+    USER -->|"EmployeeEndDate change"| E["📋 !LMG - User : Define Enddate UTC Windows from Enddate\n→ Calculate UTC timestamp"]
+    USER -->|"O365 license changed"| L["📋 !LMG - User : Modification O365 Licence\n→ Activate O365 Licence\n→ Calculate Email"]
+    USER -->|"Photo changed"| P["📋 !LMG - User : Update Photo To Entra ID\n→ PowerShell upload to Entra ID"]
+    USER -->|"LMG_PreferredLanguageRef"| PL["📋 !LMG - User : Change PreferredLanguage when LMG_PreferredLanguageRef Change\n→ Update PreferredLanguage"]
+    USER -->|"LMG_GroupMemberOf changed"| G["📋 !LMG - User : Add users to group\n→ MIM group membership management"]
+    style USER fill:#1a2e1a,stroke:#27ae60
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>Special case — Internal Permanents without end date</h3>
+      <div class="mermaid-wrap">
+        <div class="mermaid">
+flowchart LR
+    SET6["Set: Internal Permanent with endDate without user_departure\n/Person[\nEmployeeType='Internal Permanent'\nand EmployeeEndDate > 2013-12-31\nand User_Departure=False\nand Visible=True]"]
+    SET6 -->|"Set Transition"| MPR8["📋 !LMG - User : Internal Permanent with endDate without user_departure\n(SetTransition)"]
+    MPR8 --> WF16["⚡ Set Internal Permanent end date\n→ UpdateResources\n(sets a standard end date\nfor permanents with no declared departure)"]
+    style MPR8 fill:#3d1a1a,stroke:#e74c3c
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PHASE 6 — BLOCKING -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-phase6">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>7. Phase 6 — Manual Blocking</h2>
+    <span class="phase-badge badge-orange">🟠 Blocking</span>
+  </button>
+  <div class="section-body open">
+    <p>An administrator or HR can manually block an account without waiting for the end date.</p>
+
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+flowchart TD
+    ADMIN["👤 Administrator / HR"]
+    ADMIN -->|"Sets the flag"| FLAG2["LMG_BlockAccount = True"]
+    FLAG2 --> SET7["Set: All LMG Users Not Admin with LMG_BlockAccount to True\n/Person[LMG_BlockAccount=True]"]
+    SET7 -->|"Set Transition (entry)"| MPR9["📋 !LMG - User : Block Account and Force Reset Password\n(SetTransition)"]
+    MPR9 --> WF17["⚡ Set Inactive\n→ FunctionActivity (account disabled)"]
+    MPR9 --> WF18["⚡ Reset AD User Password - Red Button\n→ UpdateResources + PowerShell\n(emergency password reset)"]
+    FLAG2 --> AUTH["📋 !LMG - User : Block Account Activation if LMG_BlockAccount is True\n(Request · Modify)\n→ AuthZ workflow blocks\nany activation attempt\nwhile LMG_BlockAccount=True"]
+    REVERT["Admin sets:\nLMG_BlockAccount = False\nor LMG_ForceEnable = True"]
+    REVERT -->|"Leaves the Set"| REACTIVE["→ Phase 4: Reactivation\n(ForceEnable)"]
+    style MPR9 fill:#3d1a1a,stroke:#e74c3c
+    style FLAG2 fill:#2a1400,stroke:#e65100
+    style REVERT fill:#1a2e1a,stroke:#27ae60
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PHASE 7 — PASSWORD RESET -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-phase7">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>8. Phase 7 — AD Password Reset</h2>
+    <span class="phase-badge badge-orange">🔑 Password Reset</span>
+  </button>
+  <div class="section-body open">
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+flowchart LR
+    FLAG3["Admin / HR sets:\nResetADAccount = True"]
+    FLAG3 --> SET8["Set: Users - Reset AD User\n/Person[ResetADAccount=True and Visible=True]"]
+    SET8 -->|"Set Transition"| MPR10["📋 !LMG - User : Reset AD User Password\n(SetTransition)"]
+    MPR10 --> WF19["⚡ Reset AD User Password\n→ UpdateResources\n→ PowerShell (reset in AD)"]
+    MPR10 --> WF20["⚡ Notification Manager Reset Password\n→ UpdateResources\n(email to manager)"]
+    style MPR10 fill:#3d1a1a,stroke:#e74c3c
+    style FLAG3 fill:#2a1800,stroke:#e67e22
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PHASE 8 — DEACTIVATION -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-phase8">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>9. Phase 8 — Deactivation (end of contract)</h2>
+    <span class="phase-badge badge-red">🔴 Deactivation</span>
+  </button>
+  <div class="section-body open">
+    <p>Deactivation is <strong>automatic</strong>, driven by <code>EmployeeEndDate</code>.</p>
+
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+flowchart TD
+    TIMER["🕐 Current date > EmployeeEndDate\nand Visible = True"]
+    TIMER --> SET9["Set: Users - End Date was 1 day ago\n/Person[\nEmployeeEndDate < now()\nand Visible=True]"]
+    SET9 -->|"Set Transition (entry)"| MPR11["📋 !LMG - User : Disable User\n(SetTransition)"]
+    MPR11 --> WF21["⚡ Set Inactive\n→ FunctionActivity\n(account disabled in MIM + AD)"]
+    WF21 --> AD_DISABLE["AD: account disabled\nmoved to Quarantine OU"]
+    SET9 -->|"Set Transition (exit)\nif EndDate pushed forward"| MPR12["📋 !LMG - User : Set Active if EndDate is changed in future.\n(SetTransition)"]
+    MPR12 --> WF22["⚡ Set Active\n→ FunctionActivity (reactivation)"]
+    style MPR11 fill:#3d1a1a,stroke:#e74c3c
+    style MPR12 fill:#3d1a1a,stroke:#e74c3c
+    style AD_DISABLE fill:#1e1030,stroke:#9b59b6
+    style TIMER fill:#2a0808,stroke:#c62828
+      </div>
+    </div>
+
+    <div class="callout callout-ok">
+      <span class="callout-icon">🔄</span>
+      <div><strong>Reversibility:</strong> If <code>EmployeeEndDate</code> is pushed into the future, the account leaves the "End Date was 1 day ago" set and the MPR <code>Set Active if EndDate is changed in future</code> triggers to <strong>reactivate</strong> the account automatically.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PHASE 9 — DELETION -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-phase9">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>10. Phase 9 — Quarantine and Deletion</h2>
+    <span class="phase-badge badge-grey">⚫ Deletion</span>
+  </button>
+  <div class="section-body open">
+    <p>After deactivation, the user enters a <strong>180-day retention period</strong> before permanent deletion.</p>
+
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+flowchart TD
+    Q1["Inactive account\nin Quarantine OU in AD"]
+    Q1 --> WAIT["⏳ Wait 180 days after EmployeeEndDate"]
+    WAIT --> SET10["Set: Users - EmployeeEndDate +180 days\n/Person[\nEmployeeEndDate > now()+180d\nand DN ends with OU=Quarantine,...\nand Visible=True]"]
+    SET10 -->|"Set Transition"| MPR13["📋 ## Users - Delete User (+180 days)\n⛔ CURRENTLY DISABLED\n(SetTransition)"]
+    MPR13 --> WF23["⚡ Delete User (+180 days)\n→ DeleteResources\n(permanent deletion from MIM + AD)"]
+    style Q1 fill:#1a1a1a,stroke:#455a64
+    style WAIT fill:#1a1a1a,stroke:#455a64
+    style MPR13 fill:#2a2a2a,stroke:#757575
+    style SET10 fill:#1a1a1a,stroke:#455a64
+      </div>
+    </div>
+
+    <div class="callout callout-crit">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>Important note:</strong> The deletion MPR (<code>## Users - Delete User (+180 days)</code>) is currently <strong>disabled</strong> (<code>Disabled = True</code>). Deletions therefore do not happen automatically in the current state. A manual action or reactivation of this MPR is required to purge expired accounts.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- EMPLOYEETYPE -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-emptype">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>11. Special Cases by EmployeeType</h2>
+    <span class="phase-badge badge-cyan">👔 EmployeeType</span>
+  </button>
+  <div class="section-body open">
+    <p>The contract type (<code>EmployeeType</code>) directly influences <code>EmployeeEndDate</code> management.</p>
+
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+flowchart TD
+    ET{"EmployeeType ?"}
+    ET -->|"Permanent\n(iHris source)"| PERM["!LMG - User : Erase EmployeeEndDate From iHris Permanent Users\nSet Transition: leaves Set\n'Permanent Users with EmployeeEndDate'\n→ Erase employeeEndDate (Permanent)\n→ EmployeeEndDate removed\n(account without end date = permanent)"]
+    ET -->|"Temporary\n(iHris source)"| TEMP["!LMG - User : Erase EmployeeEndDate From iHris Temporary Users\nSet Transition: leaves Set\n'Temporary Users with EmployeeEndDate'\n→ Erase employeeEndDate (Temporary)\n→ EmployeeEndDate kept\n(end date maintained)"]
+    ET -->|"Internal Permanent\n(without departure date)"| INTPERM["!LMG - User : Internal Permanent with endDate without user_departure\nSet: /Person[EmployeeType='Internal Permanent'\nand EmployeeEndDate > 2013-12-31\nand User_Departure=False]\n→ Set Internal Permanent end date\n(standard end date calculated)"]
+    style PERM fill:#1a2e1a,stroke:#27ae60
+    style TEMP fill:#2a2800,stroke:#f9a825
+    style INTPERM fill:#0d1f3c,stroke:#1565c0
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>iHris Export</h3>
+      <div class="mermaid-wrap">
+        <div class="mermaid">
+flowchart LR
+    SET11["Set: All LMG users for iHris export\n(iHris criteria defined by filter)"]
+    SET11 -->|"Set Transition"| MPR14["📋 !LMG - User : iHris Export\n(SetTransition)"]
+    MPR14 --> WF24["⚡ iHris Export\n→ UpdateResources\n(data sent back to iHris)"]
+    style MPR14 fill:#3d1a1a,stroke:#e74c3c
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- KEY ATTRIBUTES -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-attrs">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>12. Key Lifecycle Attributes</h2>
+    <span class="phase-badge badge-blue">📋 Attributes</span>
+  </button>
+  <div class="section-body open">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Attribute</th><th>Type</th><th>Role in the lifecycle</th></tr></thead>
+        <tbody>
+          <tr><td><code>EmployeeStartDate</code></td><td>DateTime</td><td>Automatic activation date (D-10)</td></tr>
+          <tr><td><code>EmployeeEndDate</code></td><td>DateTime</td><td>Automatic deactivation date</td></tr>
+          <tr><td><code>EmployeeType</code></td><td>String</td><td><code>Permanent</code> / <code>Temporary</code> / <code>Internal Permanent</code> — drives end date management</td></tr>
+          <tr><td><code>Visible</code></td><td>Boolean</td><td><code>True</code> = active user visible in MIM. Changes to <code>False</code> on deactivation</td></tr>
+          <tr><td><code>AccountName</code></td><td>String</td><td>AD login (sAMAccountName). Uniquely generated at creation</td></tr>
+          <tr><td><code>InitialPassword</code></td><td>String</td><td>Initial password temporarily stored in MIM</td></tr>
+          <tr><td><code>DNAD</code></td><td>String</td><td>Target Distinguished Name in AD (e.g. <code>CN=jdupont,OU=FR,...</code>)</td></tr>
+          <tr><td><code>LMG_BlockAccount</code></td><td>Boolean</td><td>Manual blocking flag. <code>True</code> → immediate deactivation + password reset</td></tr>
+          <tr><td><code>LMG_ForceEnable</code></td><td>Boolean</td><td>Forced activation flag. <code>True</code> → immediate activation + O365 license</td></tr>
+          <tr><td><code>ResetADAccount</code></td><td>Boolean</td><td>AD password reset flag. <code>True</code> → reset + manager notification</td></tr>
+          <tr><td><code>User_Departure</code></td><td>Boolean</td><td>Indicates a declared departure (for internal permanents)</td></tr>
+          <tr><td><code>LMG_mS-DS-ConsistencyGuid</code></td><td>String</td><td>Consistency GUID for AAD Connect. Presence = user in Entra ID</td></tr>
+          <tr><td><code>LMG_CompanyRef</code></td><td>Reference</td><td>Reference to the Company object (source of company attributes)</td></tr>
+          <tr><td><code>LMG_SiteRef</code></td><td>Reference</td><td>Reference to the Site object (source: Country, City, Cluster...)</td></tr>
+          <tr><td><code>LMG_UnitRef</code></td><td>Reference</td><td>Reference to the Unit / BL object</td></tr>
+          <tr><td><code>LMG_GroupMemberOf</code></td><td>MultiValue</td><td>MIM groups the user should be a member of</td></tr>
+          <tr><td><code>DisplayName</code></td><td>String</td><td>Display name, calculated from FirstName + LASTNAME + formatting rules</td></tr>
+          <tr><td><code>AccountEnabled</code></td><td>Boolean</td><td>AD account activation status</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- MPR REFERENCE -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-ref">
+  <button class="section-header" onclick="toggle(this)">
+    <span class="toggle">▼</span>
+    <h2>13. MPR and Set Reference</h2>
+    <span class="phase-badge badge-grey">📚 Reference</span>
+  </button>
+  <div class="section-body open">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Phase</th><th>MPR</th><th>Type</th><th>Trigger / Set</th></tr></thead>
+        <tbody>
+          <tr><td class="tag-create">Creation</td><td><code>!LMG - User : Init Flags</code></td><td>Request (Create)</td><td>Any Person object creation</td></tr>
+          <tr><td class="tag-create">Creation</td><td><code>!LMG - User : User Creation</code></td><td>SetTransition</td><td>Joins <code>All LMG Users not admin</code></td></tr>
+          <tr><td class="tag-create">Creation</td><td><code>!LMG - User : Check Integrity Creation</code></td><td>Request (Create)</td><td>Validation at creation</td></tr>
+          <tr><td class="tag-create">Creation</td><td><code>!LMG - User : Check Integrity Modification</code></td><td>Request (Modify)</td><td>Validation of modifications</td></tr>
+          <tr><td class="tag-attr">Attributes</td><td><code>!LMG - User : Update LMG_CompanyRef when company_ID is updated</code></td><td>Request (Create/Modify)</td><td><code>company_ID</code> changed</td></tr>
+          <tr><td class="tag-attr">Attributes</td><td><code>!LMG - User : Update LMG_SiteRef when LMG_SiteID Change</code></td><td>Request (Create/Modify)</td><td><code>LMG_SiteID</code> changed</td></tr>
+          <tr><td class="tag-attr">Attributes</td><td><code>!LMG - User : Update LMG_Unit when LMG_UnitCode Change</code></td><td>Request (Create/Modify)</td><td><code>LMG_UnitCode</code> changed</td></tr>
+          <tr><td class="tag-attr">Attributes</td><td><code>!LMG - User : Update Company Attributes when LMG_CompanyRef Change</code></td><td>Request (Create/Modify)</td><td><code>LMG_CompanyRef</code> changed</td></tr>
+          <tr><td class="tag-attr">Attributes</td><td><code>!LMG - User : Update Site attribute when LMG_SiteRef change</code></td><td>Request (Modify)</td><td><code>LMG_SiteRef</code> changed</td></tr>
+          <tr><td class="tag-attr">Attributes</td><td><code>!LMG - User : Update Unit attributes when LMG_UnitRef change</code></td><td>Request (Create/Modify)</td><td><code>LMG_UnitRef</code> changed</td></tr>
+          <tr><td class="tag-attr">Attributes</td><td><code>!LMG - User : Update FirstName LastName</code></td><td>Request (Modify)</td><td>First or last name changed</td></tr>
+          <tr><td class="tag-attr">Attributes</td><td><code>!LMG - User : Update Manager Refence From ManagerID</code></td><td>Request (Modify)</td><td><code>ManagerID</code> changed</td></tr>
+          <tr><td class="tag-attr">Attributes</td><td><code>!LMG - User : Update ManagerID From ManagerRef</code></td><td>Request (Create/Modify)</td><td><code>ManagerRef</code> changed</td></tr>
+          <tr><td class="tag-attr">Attributes</td><td><code>!LMG - User : Define Enddate UTC Windows from Enddate</code></td><td>Request (Modify)</td><td><code>EmployeeEndDate</code> changed</td></tr>
+          <tr><td class="tag-attr">Attributes</td><td><code>!LMG - User : When EndDate and StartDate Change</code></td><td>Request (Modify)</td><td><code>EndDate</code>/<code>StartDate</code> changed</td></tr>
+          <tr><td class="tag-attr">Attributes</td><td><code>!LMG - User : Modification EmployeeType</code></td><td>Request (Modify)</td><td><code>EmployeeType</code> changed</td></tr>
+          <tr><td class="tag-attr">Attributes</td><td><code>!LMG - User : Modification O365 Licence</code></td><td>Request (Modify/Create)</td><td>O365 license changed</td></tr>
+          <tr><td class="tag-attr">Attributes</td><td><code>!LMG - User : Update Photo To Entra ID</code></td><td>Request (Modify)</td><td><code>Photo</code> changed</td></tr>
+          <tr><td class="tag-attr">Attributes</td><td><code>!LMG - User : Change PreferredLanguage when LMG_PreferredLanguageRef Change</code></td><td>Request (Modify)</td><td>Language changed</td></tr>
+          <tr><td class="tag-attr">Attributes</td><td><code>!LMG - User : MailDomain change</code></td><td>Request (Modify)</td><td><code>MailDomain</code> changed</td></tr>
+          <tr><td class="tag-prov">Provisioning</td><td><code>!LMG - User : Provisioning to AD</code></td><td>SetTransition</td><td>Joins <code>Ready for AD provisioning</code></td></tr>
+          <tr><td class="tag-prov">Provisioning</td><td><code>!LMG - User : Set ADaccountstatus</code></td><td>SetTransition</td><td>Joins <code>All LMG Users in EntraID</code></td></tr>
+          <tr><td class="tag-prov">Provisioning</td><td><code>!LMG - User : Update Site attribute when LMG_SiteRef change - Creation</code></td><td>SetTransition</td><td>Joins <code>users not admin with AccountName</code></td></tr>
+          <tr><td class="tag-notif">Notification</td><td><code>!LMG - User : Notification - Manager new user</code></td><td>SetTransition</td><td>Joins <code>All users with initial password</code></td></tr>
+          <tr><td class="tag-activ">Activation</td><td><code>!LMG - User : Activate User</code></td><td>SetTransition</td><td>Joins <code>Start Date is in 10 days</code></td></tr>
+          <tr><td class="tag-activ">Activation</td><td><code>!LMG - User : Activate user - Force Enabled</code></td><td>SetTransition</td><td>Joins <code>ForceEnable to True</code></td></tr>
+          <tr><td class="tag-block">Blocking</td><td><code>!LMG - User : Block Account and Force Reset Password</code></td><td>SetTransition</td><td>Joins <code>LMG_BlockAccount to True</code></td></tr>
+          <tr><td class="tag-block">Blocking</td><td><code>!LMG - User : Block Account Activation if LMG_BlockAccount is True</code></td><td>Request (Modify)</td><td>AuthZ: blocks activation if BlockAccount=True</td></tr>
+          <tr><td class="tag-reset">Password Reset</td><td><code>!LMG - User : Reset AD User Password</code></td><td>SetTransition</td><td>Joins <code>Reset AD User</code></td></tr>
+          <tr><td class="tag-reset">Unlock</td><td><code>!LMG - User : Unlock AD User</code></td><td>SetTransition</td><td>Joins <code>Unlock AD User</code></td></tr>
+          <tr><td class="tag-disable">Deactivation</td><td><code>!LMG - User : Disable User</code></td><td>SetTransition</td><td>Joins <code>End Date was 1 day ago</code></td></tr>
+          <tr><td class="tag-disable">Reactivation</td><td><code>!LMG - User : Set Active if EndDate is changed in future.</code></td><td>SetTransition</td><td>Leaves <code>End Date was 1 day ago</code></td></tr>
+          <tr><td class="tag-delete">Deletion ⛔</td><td><code>## Users - Delete User (+180 days)</code></td><td>SetTransition</td><td>Joins <code>EmployeeEndDate +180 days</code></td></tr>
+          <tr><td class="tag-perm">Permanent</td><td><code>!LMG - User : Erase EmployeeEndDate From iHris Permanent Users</code></td><td>SetTransition</td><td>Leaves <code>Permanent Users with EmployeeEndDate</code></td></tr>
+          <tr><td class="tag-temp">Temporary</td><td><code>!LMG - User : Erase EmployeeEndDate From iHris Temporary Users</code></td><td>SetTransition</td><td>Leaves <code>Temporary Users with EmployeeEndDate</code></td></tr>
+          <tr><td class="tag-intperm">Internal Perm.</td><td><code>!LMG - User : Internal Permanent with endDate without user_departure</code></td><td>SetTransition</td><td>Joins <code>Internal Permanent with endDate</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main-content -->
+
+<!-- ═══ FULL-SCREEN MODAL ═══ -->
+<div id="diag-modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-inner">
+    <div class="modal-toolbar">
+      <span id="modal-ttl" class="modal-title">Diagram</span>
+      <div class="modal-actions">
+        <button onclick="zoomDiag(0.15)">＋ Zoom</button>
+        <button onclick="zoomDiag(-0.15)">－ Zoom</button>
+        <button onclick="zoomReset()">↺ Reset</button>
+        <span class="zoom-lbl" id="zoom-lbl">100%</span>
+        <button onclick="closeModal()">✕ Close</button>
+      </div>
+    </div>
+    <div class="modal-body" id="modal-body">
+      <div id="modal-svg-el"></div>
+    </div>
+  </div>
+</div>
+
+<footer>Documentation generated from the MIM service policy.xml export — March 2026 &nbsp;|&nbsp; <a href="LMG_SyncConfig_Metaverse_EN.html">SyncConfig &amp; Metaverse →</a> &nbsp;|&nbsp; <a href="LMG_User_Lifecycle.html">🇫🇷 Version française</a></footer>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: 'dark',
+    themeVariables: {
+      background: '#0d1117',
+      primaryColor: '#1e3a5f',
+      primaryTextColor: '#e0e0e0',
+      primaryBorderColor: '#2196f3',
+      lineColor: '#546e7a',
+      secondaryColor: '#1a2a3d',
+      tertiaryColor: '#1e1e1e',
+      edgeLabelBackground: '#1e1e1e',
+      clusterBkg: '#0d1117',
+      clusterBorder: '#333',
+      titleColor: '#90caf9',
+      nodeTextColor: '#e0e0e0'
+    },
+    flowchart: { curve: 'basis', htmlLabels: true, useMaxWidth: true }
+  });
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    try { await mermaid.run({ querySelector: '.mermaid' }); } catch(e) { console.warn('Mermaid:', e); }
+
+    document.querySelectorAll('.mermaid-wrap').forEach(wrap => {
+      if (!wrap.querySelector('svg')) return;
+      const btn = document.createElement('button');
+      btn.className = 'expand-btn';
+      btn.textContent = '⛶  Expand';
+      btn.addEventListener('click', () => openDiagram(wrap));
+      wrap.appendChild(btn);
+    });
+
+    const sections = document.querySelectorAll('.section');
+    const navLinks = document.querySelectorAll('.navbar a');
+    window.addEventListener('scroll', () => {
+      let cur = '';
+      sections.forEach(s => { if (window.scrollY >= s.offsetTop - 60) cur = s.id; });
+      navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
+    }, { passive: true });
+
+    document.getElementById('modal-body').addEventListener('wheel', e => {
+      if (!document.getElementById('diag-modal').classList.contains('open')) return;
+      e.preventDefault();
+      zoomDiag(e.deltaY < 0 ? 0.1 : -0.1);
+    }, { passive: false });
+  });
+
+  function toggle(btn) {
+    const body = btn.nextElementSibling;
+    const t = btn.querySelector('.toggle');
+    const isOpen = body.classList.toggle('open');
+    t.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(-90deg)';
+  }
+
+  let _baseW = 1400, _scale = 1;
+
+  function openDiagram(wrap) {
+    const svg = wrap.querySelector('svg');
+    if (!svg) return;
+    const sec = wrap.closest('.section');
+    document.getElementById('modal-ttl').textContent =
+      sec ? sec.querySelector('h2').textContent.trim() : 'Diagram';
+    const vb = svg.getAttribute('viewBox');
+    if (vb) {
+      const parts = vb.trim().split(/[\s,]+/);
+      _baseW = parts.length >= 4 ? Math.max(parseInt(parts[2]) || 1400, 900) : 1400;
+    } else {
+      _baseW = parseInt(svg.getAttribute('width')) || 1400;
+    }
+    const clone = svg.cloneNode(true);
+    clone.style.cssText = `width:${_baseW}px;height:auto;display:block`;
+    const el = document.getElementById('modal-svg-el');
+    el.innerHTML = '';
+    el.appendChild(clone);
+    _scale = 1;
+    document.getElementById('zoom-lbl').textContent = '100%';
+    document.getElementById('diag-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('diag-modal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function zoomDiag(delta) {
+    _scale = Math.min(5, Math.max(0.2, _scale + delta));
+    const svg = document.querySelector('#modal-svg-el svg');
+    if (svg) svg.style.width = Math.round(_baseW * _scale) + 'px';
+    document.getElementById('zoom-lbl').textContent = Math.round(_scale * 100) + '%';
+  }
+
+  function zoomReset() {
+    _scale = 1;
+    const svg = document.querySelector('#modal-svg-el svg');
+    if (svg) svg.style.width = _baseW + 'px';
+    document.getElementById('zoom-lbl').textContent = '100%';
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>
